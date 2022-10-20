@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\sharedStatus;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -20,7 +21,7 @@ class shape extends Model
     ];
     public function colors()
     {
-        return $this->hasMany(color::class);
+        return $this->hasMany(color::class, 'id_shape')->where('status', sharedStatus::$active);
     }
     public function landingPage()
     {

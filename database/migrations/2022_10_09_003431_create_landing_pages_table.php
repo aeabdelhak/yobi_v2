@@ -17,7 +17,9 @@ return new class extends Migration
             $table->id();
             $table->string('name');
             $table->string('description');
-            $table->string('link');
+            $table->string('product_name');
+            $table->text('product_description');
+            $table->string('domain')->unique();
             $table->integer('status')->default(1);
             $table->unsignedBigInteger('id_pallete');
             $table->foreign('id_pallete')->references('id')->on('color_palettes');

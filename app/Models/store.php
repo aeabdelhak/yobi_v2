@@ -13,8 +13,14 @@ class store extends Model
         'description',
         'link',
         'status',
+        'token',
+        'sucret_token',
         'id_logo',
 
+    ];
+    protected $hidden = [
+        'token',
+        'sucret_token',
     ];
     use HasFactory;
 }

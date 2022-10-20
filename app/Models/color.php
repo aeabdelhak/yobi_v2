@@ -20,7 +20,11 @@ class color extends Model
     ];
     public function shape()
     {
-        $this->belongsTo(shape::class);
+        $this->belongsTo(shape::class, 'id_shape');
+    }
+    public function sizes()
+    {
+        $this->hasMany(size::class, 'id_color');
     }
     public function scopeOfShape($query, $id)
     {

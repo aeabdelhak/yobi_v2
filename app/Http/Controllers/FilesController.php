@@ -57,5 +57,9 @@ class FilesController extends Controller
     {
         return Storage::download($req->path);
     }
+    public static function path($id)
+    {
+        return file::find($id)->value('path');
+    }
 
 }

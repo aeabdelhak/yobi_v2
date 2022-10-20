@@ -13,6 +13,9 @@ use App\Http\Controllers\permissionController;
 use App\Http\Controllers\shapesController;
 use App\Http\Controllers\sizesController;
 use App\Http\Controllers\StoreController;
+use App\Http\Controllers\tawsilixController;
+use App\Http\Controllers\userResultsController;
+use App\Http\Controllers\vercelController;
 use Illuminate\Support\Facades\Route;
 
 Route::controller(AuthController::class)->group(function () {
@@ -26,7 +29,7 @@ Route::controller(AuthController::class)->group(function () {
 
 });
 Route::controller(StoreController::class)->group(function () {
-    Route::post('store/new', 'new');
+    Route::post('store/new', 'newStore');
     Route::get('store/get ', 'get');
     Route::get('store/all', 'All');
     Route::delete('store/delete', 'delete');
@@ -46,6 +49,7 @@ Route::controller(LandinPageController::class)->group(function () {
     Route::post('landing', 'newLanding');
     Route::delete('landing', 'delete');
     Route::put('landing', 'edit');
+    Route::get('landing/client', 'client');
 });
 Route::controller(shapesController::class)->group(function () {
     Route::get('shape', 'get');
@@ -89,10 +93,27 @@ Route::controller(orderController::class)->group(function () {
     Route::get('order/paginate', 'getOrders');
     Route::get('order/statistics', 'getStatistics');
     Route::get('order/{id}', 'getOrder');
+    Route::post('order/status', 'changeStatus');
+    Route::post('order/push', 'pushToDelivery');
+    Route::get('order/history/{id}', 'history');
 });
 Route::controller(offerController::class)->group(function () {
     Route::post('offer', 'newOffer');
     Route::post('offer/assign', 'assign');
     Route::post('offer/activate', 'setActive');
     Route::post('offer/desactivate', 'setInActive');
+});
+Route::controller(vercelController::class)->group(function () {
+    Route::post('test/{domain}', 'domainAdd');
+});
+Route::controller(tawsilixController::class)->group(function () {
+    Route::get('/tawsilix/cities', 'cities');
+    Route::get('/tawsilix/update', 'updateOrderStatus');
+});
+
+Route::controller(userResultsController::class)->group(function () {
+    Route::post('newResult', 'newResult');
+});
+Route::controller(userResultsController::class)->group(function () {
+    Route::delete('newResult/{id}', 'delete');
 });

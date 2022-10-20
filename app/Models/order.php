@@ -17,6 +17,13 @@ class order extends Model
         'address',
         'status',
         'paid',
+        'total_paid',
         'id_landing_page',
     ];
+
+    public function details()
+    {
+        return $this->hasMany(detail::class, 'id_order');
+    }
+
 }

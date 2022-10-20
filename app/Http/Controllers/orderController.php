@@ -2,19 +2,74 @@
 
 namespace App\Http\Controllers;
 
-use App\Enums\orderStatus;
+use App\Enums\orderStatus as EnumsOrderStatus;
+use App\Enums\permissions;
 use App\Models\color;
 use App\Models\detail;
 use App\Models\hasOffer;
 use App\Models\landingPage;
 use App\Models\offer;
 use App\Models\order;
+use App\Models\orderChange;
 use App\Models\shape;
+use App\Models\store;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
 class orderController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('auth:api', ['except' => ['newOrder']]);
+        $this->middleware('permission:' . permissions::$orders, ['only' => ['getTotalPrice', 'getOrders', 'history', 'getOrderName', 'getStatistics', 'changeStatus']]);
+        $this->middleware('permission:' . permissions::$delivery, ['only' => ['pushToDelivery']]);
+    }
+
+    public function getTotalPrice($id)
+    {
+        $order = order::find($id);
+        if (!$order) {
+            return NAN;
+        }
+        $price = 0;
+
+        foreach ($order->details as $key => $detail) {
+
+            $offer = offer::find($detail->id_offer);
+            $offer_price = $offer ? ($offer->promotioned_price ?? $offer->original_price) : null;
+            $shape = shape::find($detail->id_shape);
+            $shape_price = $shape->promotioned_price ?? $shape->original_price;
+
+            $price += $offer_price ?? $shape_price;
+        }
+        return $price;
+    }
+    public function getOrderName($id)
+    {
+        $names = [];
+
+        $details = detail::leftjoin('shapes', 'shapes.id', 'details.id_shape')->leftjoin('landing_pages', 'shapes.id_landing_page', 'landing_pages.id')->leftjoin('sizes', 'sizes.id', 'details.id_size')->leftjoin('colors', 'colors.id', 'details.id_color')->leftjoin('offers', 'offers.id', 'details.id_offer')->where('id_order', $id)->get(DB::raw('shapes.name shape , offers.label offer ,sizes.label size ,colors.name color  ,landing_pages.product_name'));
+        foreach ($details as $key => $detail) {
+            $name = $detail->product_name;
+            if ($detail->shape) {
+                $name .= ' . الشكل: ' . $detail->shape;
+            }
+            if ($detail->color) {
+                $name .= ' . اللون: ' . $detail->color;
+            }
+            if ($detail->size) {
+                $name .= ' . المقاس: ' . $detail->size;
+            }
+            if ($detail->offer) {
+                $name .= ' . العرض: ' . $detail->offer;
+            }
+
+            $names[] = $name;
+        }
+        return implode(',', $names);
+
+    }
+
     public function newOrder(Request $req)
     {
         $order = new order();
@@ -28,7 +83,7 @@ class orderController extends Controller
             $offer = offer::find($req->id_offer);
             $offer_price = $offer ? ($offer->promotioned_price ?? $offer->original_price) : null;
             $shape = shape::find($req->id);
-            $shape_price = $shape->promotioned_price ?? $shape->original_price;
+            $shape_price = $shape ? $shape->promotioned_price ?? $shape->original_price : 0;
 
             $detail = new detail();
             $detail->id_color = $req->id_color;
@@ -47,17 +102,17 @@ class orderController extends Controller
     {
         $landingsId = landingPage::ofStore($req->storeId)->pluck('id');
         $statistcs = [
-            [orderStatus::$new => order::whereIn('id_landing_page', $landingsId)->where('status', orderStatus::$new)->count()],
-            [orderStatus::$verified => order::whereIn('id_landing_page', $landingsId)->where('status', orderStatus::$verified)->count()],
-            [orderStatus::$shipping => order::whereIn('id_landing_page', $landingsId)->where('status', orderStatus::$shipping)->count()],
-            [orderStatus::$delivered => order::whereIn('id_landing_page', $landingsId)->where('status', orderStatus::$delivered)->count()],
-            [orderStatus::$canceled => order::whereIn('id_landing_page', $landingsId)->where('status', orderStatus::$canceled)->count()],
-            [orderStatus::$noResponce => order::whereIn('id_landing_page', $landingsId)->where('status', orderStatus::$noResponce)->count()],
-            [orderStatus::$callRequested => order::whereIn('id_landing_page', $landingsId)->where('status', orderStatus::$callRequested)->count()],
-            [orderStatus::$callOv3 => order::whereIn('id_landing_page', $landingsId)->where('status', orderStatus::$callOv3)->count()],
-            [orderStatus::$voiceMail => order::whereIn('id_landing_page', $landingsId)->where('status', orderStatus::$voiceMail)->count()],
-            [orderStatus::$delayed => order::whereIn('id_landing_page', $landingsId)->where('status', orderStatus::$delayed)->count()],
-            [orderStatus::$outOfArea => order::whereIn('id_landing_page', $landingsId)->where('status', orderStatus::$outOfArea)->count()],
+            [EnumsOrderStatus::$new => order::whereIn('id_landing_page', $landingsId)->where('status', EnumsOrderStatus::$new)->count()],
+            [EnumsOrderStatus::$verified => order::whereIn('id_landing_page', $landingsId)->where('status', EnumsOrderStatus::$verified)->count()],
+            [EnumsOrderStatus::$shipping => order::whereIn('id_landing_page', $landingsId)->where('status', EnumsOrderStatus::$shipping)->count()],
+            [EnumsOrderStatus::$delivered => order::whereIn('id_landing_page', $landingsId)->where('status', EnumsOrderStatus::$delivered)->count()],
+            [EnumsOrderStatus::$canceled => order::whereIn('id_landing_page', $landingsId)->where('status', EnumsOrderStatus::$canceled)->count()],
+            [EnumsOrderStatus::$noResponce => order::whereIn('id_landing_page', $landingsId)->where('status', EnumsOrderStatus::$noResponce)->count()],
+            [EnumsOrderStatus::$callRequested => order::whereIn('id_landing_page', $landingsId)->where('status', EnumsOrderStatus::$callRequested)->count()],
+            [EnumsOrderStatus::$callOv3 => order::whereIn('id_landing_page', $landingsId)->where('status', EnumsOrderStatus::$callOv3)->count()],
+            [EnumsOrderStatus::$voiceMail => order::whereIn('id_landing_page', $landingsId)->where('status', EnumsOrderStatus::$voiceMail)->count()],
+            [EnumsOrderStatus::$delayed => order::whereIn('id_landing_page', $landingsId)->where('status', EnumsOrderStatus::$delayed)->count()],
+            [EnumsOrderStatus::$outOfArea => order::whereIn('id_landing_page', $landingsId)->where('status', EnumsOrderStatus::$outOfArea)->count()],
         ];
         return $statistcs;
 
@@ -77,8 +132,7 @@ class orderController extends Controller
             if ($req->status) {
                 return $query->whereIn('status', explode(',', $req->status));
             }
-
-        })->paginate(2);
+        })->paginate(20);
 
     }
 
@@ -86,7 +140,7 @@ class orderController extends Controller
     {
 
         $order = Order::findorfail($id);
-        $details = detail::leftjoin('shapes', 'shapes.id', 'details.id_shape')->leftjoin('sizes', 'sizes.id', 'details.id_size')->leftjoin('colors', 'colors.id', 'details.id_color')->leftjoin('offers', 'offers.id', 'details.id_offer')->where('id_order', $order->id)->get(DB::raw('shapes.name shape , offers.label offer ,sizes.label size ,colors.name color ,offers.id offerId ,colors.id colorId,price '));
+        $details = detail::leftjoin('shapes', 'shapes.id', 'details.id_shape')->leftjoin('landing_pages', 'shapes.id_landing_page', 'landing_pages.id')->leftjoin('sizes', 'sizes.id', 'details.id_size')->leftjoin('colors', 'colors.id', 'details.id_color')->leftjoin('offers', 'offers.id', 'details.id_offer')->where('id_order', $order->id)->get(DB::raw('shapes.name shape , offers.label offer ,sizes.label size ,colors.name color ,offers.id offerId ,colors.id colorId,price ,landing_pages.name'));
         foreach ($details as $key => $detail) {
 
             if ($detail->offerId && $detail->colorId) {
@@ -97,6 +151,86 @@ class orderController extends Controller
 
         }
         return compact('order', 'details');
+
+    }
+
+    public function changeStatus(Request $req)
+    {
+
+        $id = $req->id;
+        $date = $req->date;
+        $order = order::find($id);
+        if (!$order) {
+            return res('fail', 'please inter a valid id');
+        }
+
+        $status = $req->status;
+        if (in_array($status, [EnumsOrderStatus::$delayed, EnumsOrderStatus::$callRequested])) {
+            if (!$date) {
+                return res('fail', 'date field is required');
+            }
+
+        } else {
+            $date = null;
+        }
+
+        if ($status != EnumsOrderStatus::$pushedToDelivery) {
+
+            $order->status = $status;
+            $order->status_date = $date;
+            $order->save();
+            $orderChange = new orderChange();
+            $orderChange->id_order = $id;
+            $orderChange->to_date = $date;
+            $orderChange->status = $status;
+            $orderChange->note = $req->note;
+            $orderChange->save();
+
+            return res('success', 'successfuly chnaged', $order->fresh());
+
+        }
+
+    }
+    public function pushToDelivery(Request $req)
+    {
+        $id = $req->id;
+        $order = order::find($id);
+        $id_token = store::join('landing_pages', 'landing_pages.id_store', 'stores.id')->join('orders', 'landing_pages.id', 'orders.id_landing_page')->join('tawsilix_accesses', 'tawsilix_accesses.id', 'stores.id_token')->where('orders.id', $id)->value('id_token');
+
+        if ($order->status === EnumsOrderStatus::$pushedToDelivery) {
+            return res('fail', 'this order is already pushed');
+        }
+
+        $order->status = EnumsOrderStatus::$pushedToDelivery;
+        if ((new tawsilixController())->push(
+            $id,
+            $order->name,
+            $req->city,
+            $order->address,
+            $order->phone,
+            $id_token,
+            $this->getOrderName($id),
+            1,
+            $req->note,
+            $req->change,
+            $req->open,
+            $this->getTotalPrice($id))) {
+            $order->save();
+
+            $orderChange = new orderChange();
+            $orderChange->id_order = $id;
+            $orderChange->status = EnumsOrderStatus::$pushedToDelivery;
+            $orderChange->note = $req->note;
+            $orderChange->save();
+
+            return res('success', 'pushed to tawsilix successfully', $order->fresh());
+        }
+        return res('fail', 'something went wrong');
+
+    }
+    public function history($id)
+    {
+        return orderChange::leftjoin('users', 'users.id', 'order_changes.id_user')->orderby('order_changes.created_at', 'desc')->oforder($id)->get(DB::raw('order_changes.status,note,name,email,order_changes.created_at date ,to_date'));
 
     }
 

@@ -1,0 +1,120 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Enums\orderStatus;
+use App\Enums\sharedStatus;
+use App\Models\order;
+use App\Models\orderChange;
+use App\Models\shippServices;
+use App\Models\tawsilixAccess;
+use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
+
+class tawsilixController extends Controller
+{
+
+    public function cities()
+    {
+        $path = '/cities.php';
+        return $this->callapi($path);
+
+    }
+
+    public function checkStatus($id)
+    {
+
+    }
+
+    public function push(
+        $id,
+        $fullName,
+        $city,
+        $address,
+        $phone,
+        int $id_token,
+        $product,
+        int $qty,
+        $note,
+        int $change,
+        int $openpackage,
+        $price) {
+
+        $tokens = tawsilixAccess::find($id_token);
+        $tk = $tokens->token;
+        $sk = $tokens->secret_token;
+
+        $data = array(
+            'tk' => $tk,
+            'sk' => $sk,
+            'fullname' => $fullName,
+            'phone' => $phone,
+            "city" => $city,
+            "address" => $address,
+            "price" => $price,
+            "product" => $product,
+            "qty" => $qty,
+            "note" => $note,
+            "change" => $change,
+            "openpackage" => $openpackage,
+        );
+
+        $path = '/addcolis.php?' . http_build_query($data);
+
+        $req = $this->callapi($path);
+        if (isset($req->code)) {
+            $code = $req->code;
+            shippServices::create([
+                'id_order' => $id,
+                'id_shipping' => $code,
+                'by' => 'tawsilix',
+                'status' => sharedStatus::$active,
+
+            ]);
+            return true;
+        }
+        return false;
+
+    }
+
+    private function callapi($path)
+    {
+
+        return json_decode(curl('GET', 'https://tawsilex.ma' . $path));
+
+    }
+
+    public function updateOrderStatus()
+    {
+        $orders = shippServices::join('orders', 'orders.id', 'shipp_services.id_order')->where('shipp_services.status', sharedStatus::$active)->get(DB::raw('id_shipping,id_order,orders.status,shipp_services.id'));
+        $all = [];
+        foreach ($orders as $key => $order) {
+            $res = $this->callapi('/track.php?code=' . $order->id_shipping);
+            $status = orderStatus::$pushedToDelivery;
+            if ($res[0]->Etat == 'Expédié') {
+                $status = orderStatus::$delivered;
+                shippServices::where('id', $order->id)->update([
+                    'status' => sharedStatus::$inActive,
+                ]);
+            }
+            if ($res[0]->Etat == 'Prèt pour expédition') {
+                $status = orderStatus::$shipping;
+            }
+            if ($res[0]->Etat == 'Collecté par agence principale') {
+                $status = orderStatus::$collected;
+            }
+            if ($status !== $order->status) {
+                order::where('id', $order->id_order)->update(['status' => $status]);
+                $orderChange = new orderChange();
+                $orderChange->id_order = $order->id_order;
+                $orderChange->status = $status;
+                $orderChange->created_at = Carbon::createFromTimestamp($res[0]->Date_Evenement)->toDateTimeString();
+                $orderChange->save();
+            }
+
+        }
+        return $all;
+
+    }
+
+}

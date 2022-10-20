@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Enums\permissions;
 use App\Models\store;
+use App\Models\tawsilixAccess;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -31,10 +32,15 @@ class StoreController extends Controller
 
         return store::leftjoin('files', 'files.id', '=', 'id_logo')->get(DB::raw("stores.id  ,url ,stores.name,stores.created_at,description "));
     }
-    function new (Request $req) {
+    public function newStore(Request $req)
+    {
+
+        $tawsilixAccess = tawsilixAccess::firstOrCreate(['token' => $req->token, 'secret_token' => $req->secret_token]);
+
         $store = new store();
         $store->name = $req->name;
         $store->description = $req->description;
+        $store->id_token = $tawsilixAccess->id;
         $store->id_logo = FilesController::store($req->file('logo'));
         if ($store->save()) {
 
