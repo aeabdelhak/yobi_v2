@@ -44,7 +44,7 @@ class tawsilixController extends Controller
         $tk = $tokens->token;
         $sk = $tokens->secret_token;
 
-        $data = array(
+        return $data = array(
             'tk' => $tk,
             'sk' => $sk,
             'fullname' => $fullName,
@@ -61,7 +61,7 @@ class tawsilixController extends Controller
 
         $path = '/addcolis.php?' . http_build_query($data);
 
-        return $req = $this->callapi($path);
+        $req = $this->callapi($path);
         if (isset($req->code)) {
             $code = $req->code;
             shippServices::create([
