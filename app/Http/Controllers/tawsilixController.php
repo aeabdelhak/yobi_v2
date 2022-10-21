@@ -61,7 +61,7 @@ class tawsilixController extends Controller
 
         $path = '/addcolis.php?' . http_build_query($data);
 
-        return $req = $this->callapi($path);
+        $req = $this->callapi($path);
         if (isset($req->code)) {
             $code = $req->code;
             shippServices::create([
