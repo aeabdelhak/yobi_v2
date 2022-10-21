@@ -93,6 +93,11 @@ class LandinPageController extends Controller
             }
 
         }
+
+        if (count($landing->shapes) == 0) {
+            response()->status(404);
+        }
+
         $landing->results = userResult::join('files', 'files.id', 'user_results.id_image')->where('id_landing_page', $landing->id)->get(DB::raw('*,user_results.id as id'));
 
         $store->data = $landing;

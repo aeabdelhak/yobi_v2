@@ -77,7 +77,7 @@ class tawsilixController extends Controller
 
     }
 
-    private function callapi($path, $params = false)
+    private function callapi($path, $params = null)
     {
 
         return json_decode(curl('GET', 'https://tawsilex.ma' . $path), $params);
