@@ -82,10 +82,14 @@ class LandinPageController extends Controller
         $store->logo = file::find($store->id_logo);
         $landing->audios = audio::leftjoin('files', 'files.id', 'id_file')->where('id_landing_page', $landing->id)->get(DB::raw('owner,audio.id,url,path'));
         foreach ($landing->shapes as $key => $shape) {
-            foreach ($shape->colors as $key => $color) {
-                $color->image = file::find($color->id_image);
-                $color->offers = offer::join('has_offers', 'has_offers.id_offer', 'offers.id')->join('files', 'files.id', 'has_offers.id_image')->where('id_color', $color->id)->where('has_offers.status', sharedStatus::$active)->get(DB::raw(('id_color,path,offers.id,promotioned_price,original_price,label,has_offers.status,has_offers.id idOffer')));
-                $color->sizes = size::ofcolor($color->id)->where('status', sharedStatus::$active)->get();
+            if (count($shape->colors) == 0) {
+                unset($landing->shapes[$key]);
+            } else {
+                foreach ($shape->colors as $key => $color) {
+                    $color->image = file::find($color->id_image);
+                    $color->offers = offer::join('has_offers', 'has_offers.id_offer', 'offers.id')->join('files', 'files.id', 'has_offers.id_image')->where('id_color', $color->id)->where('has_offers.status', sharedStatus::$active)->get(DB::raw(('id_color,path,offers.id,promotioned_price,original_price,label,has_offers.status,has_offers.id idOffer')));
+                    $color->sizes = size::ofcolor($color->id)->where('status', sharedStatus::$active)->get();
+                }
             }
 
         }
