@@ -204,6 +204,21 @@ class orderController extends Controller
         }
 
         $order->status = EnumsOrderStatus::$pushedToDelivery;
+
+        return (new tawsilixController())->push(
+            $id,
+            $order->name,
+            $req->city,
+            $order->address,
+            $order->phone,
+            $id_token,
+            $this->getOrderName($id),
+            1,
+            $req->note,
+            $req->change,
+            $req->open,
+            $this->getTotalPrice($id));
+
         if ((new tawsilixController())->push(
             $id,
             $order->name,
@@ -218,7 +233,6 @@ class orderController extends Controller
             $req->open,
             $this->getTotalPrice($id))) {
             $order->save();
-
             $orderChange = new orderChange();
             $orderChange->id_order = $id;
             $orderChange->status = EnumsOrderStatus::$pushedToDelivery;
