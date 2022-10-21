@@ -44,7 +44,7 @@ class tawsilixController extends Controller
         $tk = $tokens->token;
         $sk = $tokens->secret_token;
 
-        return $data = array(
+        $data = array(
             'tk' => $tk,
             'sk' => $sk,
             'fullname' => $fullName,
@@ -54,12 +54,12 @@ class tawsilixController extends Controller
             "price" => $price,
             "product" => $product,
             "qty" => $qty,
-            "note" => $note,
+            "note" => $note ?? '',
             "change" => $change,
             "openpackage" => $openpackage,
         );
 
-        $path = '/addcolis.php?' . http_build_query($data);
+        return $path = '/addcolis.php?' . http_build_query($data);
 
         $req = $this->callapi($path);
         if (isset($req->code)) {
