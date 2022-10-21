@@ -89,7 +89,7 @@ class tawsilixController extends Controller
         $orders = shippServices::join('orders', 'orders.id', 'shipp_services.id_order')->where('shipp_services.status', sharedStatus::$active)->get(DB::raw('id_shipping,id_order,orders.status,shipp_services.id'));
         foreach ($orders as $key => $order) {
             $res = $this->callapi('/track.php?code=' . $order->id_shipping, true);
-            $status = orderStatus::$pushedToDelivery;
+            $status = null;
             if ($res["0"]['state'] == 'Livré') {
                 $status = orderStatus::$delivered;
                 shippServices::where('id', $order->id)->update([
@@ -105,7 +105,10 @@ class tawsilixController extends Controller
             if ($res["0"]['state'] == 'Collecté par agence principale') {
                 $status = orderStatus::$collected;
             }
-            if ($status !== $order->status) {
+            if ($res["0"]['state'] == 'En attente de ramassage') {
+                $status = orderStatus::$pushedToDelivery;
+            }
+            if ($status != null && $status !== $order->status) {
                 order::where('id', $order->id_order)->update(['status' => $status]);
                 $orderChange = new orderChange();
                 $orderChange->id_order = $order->id_order;
