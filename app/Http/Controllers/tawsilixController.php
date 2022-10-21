@@ -101,6 +101,9 @@ class tawsilixController extends Controller
             }
             if ($res["0"]['state'] == 'Retour client reçu') {
                 $status = orderStatus::$returned;
+                shippServices::where('id', $order->id)->update([
+                    'status' => sharedStatus::$inActive,
+                ]);
             }
             if ($res["0"]['state'] == 'Collecté par agence principale') {
                 $status = orderStatus::$collected;
