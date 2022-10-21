@@ -17,5 +17,6 @@ class orderStatus
     public static $delayed = 11;
     public static $outOfArea = 12;
     public static $collected = 13;
+    public static $returned = 14;
 
 }

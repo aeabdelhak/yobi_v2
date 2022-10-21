@@ -77,30 +77,32 @@ class tawsilixController extends Controller
 
     }
 
-    private function callapi($path)
+    private function callapi($path, $params = false)
     {
 
-        return json_decode(curl('GET', 'https://tawsilex.ma' . $path));
+        return json_decode(curl('GET', 'https://tawsilex.ma' . $path), $params);
 
     }
 
     public function updateOrderStatus()
     {
         $orders = shippServices::join('orders', 'orders.id', 'shipp_services.id_order')->where('shipp_services.status', sharedStatus::$active)->get(DB::raw('id_shipping,id_order,orders.status,shipp_services.id'));
-        $all = [];
         foreach ($orders as $key => $order) {
-            $res = $this->callapi('/track.php?code=' . $order->id_shipping);
+            $res = $this->callapi('/track.php?code=' . $order->id_shipping, true);
             $status = orderStatus::$pushedToDelivery;
-            if ($res[0]->Etat == 'Expédié') {
+            if ($res["0"]['state'] == 'Livré') {
                 $status = orderStatus::$delivered;
                 shippServices::where('id', $order->id)->update([
                     'status' => sharedStatus::$inActive,
                 ]);
             }
-            if ($res[0]->Etat == 'Prèt pour expédition') {
+            if ($res["0"]['state'] == 'Prèt pour expédition') {
                 $status = orderStatus::$shipping;
             }
-            if ($res[0]->Etat == 'Collecté par agence principale') {
+            if ($res["0"]['state'] == 'Retour client reçu') {
+                $status = orderStatus::$returned;
+            }
+            if ($res["0"]['state'] == 'Collecté par agence principale') {
                 $status = orderStatus::$collected;
             }
             if ($status !== $order->status) {
@@ -108,12 +110,11 @@ class tawsilixController extends Controller
                 $orderChange = new orderChange();
                 $orderChange->id_order = $order->id_order;
                 $orderChange->status = $status;
-                $orderChange->created_at = Carbon::createFromTimestamp($res[0]->Date_Evenement)->toDateTimeString();
+                $orderChange->created_at = Carbon::createFromTimestamp($res["0"]['eventdate'])->toDateTimeString();
                 $orderChange->save();
             }
 
         }
-        return $all;
 
     }
 
