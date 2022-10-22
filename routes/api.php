@@ -44,12 +44,12 @@ Route::controller(colorPalleteController::class)->group(function () {
     Route::post('pallete/edit', 'edit');
 });
 Route::controller(LandinPageController::class)->group(function () {
+    Route::get('landing/client', 'client');
     Route::get('landing/all', 'all');
     Route::get('landing', 'get');
     Route::post('landing', 'newLanding');
     Route::delete('landing', 'delete');
     Route::put('landing', 'edit');
-    Route::get('landing/client', 'client');
 });
 Route::controller(shapesController::class)->group(function () {
     Route::get('shape', 'get');
