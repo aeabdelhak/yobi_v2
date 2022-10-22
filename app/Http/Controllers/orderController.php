@@ -153,7 +153,7 @@ class orderController extends Controller
             if ($req->status) {
                 return $query->whereIn('status', explode(',', $req->status));
             }
-        })->paginate(20);
+        })->orderby('created_at', 'desc')->paginate(20);
 
     }
 
