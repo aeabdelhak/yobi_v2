@@ -6,6 +6,7 @@ use App\Enums\permissions;
 use App\Enums\sharedStatus;
 use App\Models\audio;
 use App\Models\card;
+use App\Models\fbPixel;
 use App\Models\file;
 use App\Models\landingPage;
 use App\Models\offer;
@@ -79,6 +80,7 @@ class LandinPageController extends Controller
         $host = $req->header('Host');
         $landing = landingPage::where('domain', $host)->with(['poster', 'pallete', 'cards'])->firstorfail();
         $store = store::find($landing->id_store);
+        $store->pixel = fbPixel::where('id_store', $landing->id_store)->first();
         $store->logo = file::find($store->id_logo);
         $landing->audios = audio::leftjoin('files', 'files.id', 'id_file')->where('id_landing_page', $landing->id)->get(DB::raw('owner,audio.id,url,path'));
         foreach ($landing->shapes as $key => $shape) {
