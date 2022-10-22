@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Enums\permissions;
 use App\Enums\sharedStatus;
 use App\Models\color;
+use App\Models\hasOffer;
 use App\Models\landingPage;
 use App\Models\offer;
 use App\Models\shape;
@@ -27,7 +28,19 @@ class colorsController extends Controller
         $landing = landingPage::findorfail($req->id);
         $shape = shape::landing($req->id)->whereid($req->shapeId)->firstorfail();
         $color = color::where('colors.id', $req->colorId)->leftJoin('files', 'files.id', 'id_image')->ofshape($shape->id)->firstorfail(DB::raw('colors.name,color_code,colors.id,url,status'));
-        $offers = offer::leftjoin('has_offers', 'has_offers.id_offer', 'offers.id')->leftjoin('files', 'files.id', 'has_offers.id_image')->ofShape($req->shapeId)->get(DB::raw(('id_color,path,offers.id,promotioned_price,original_price,label,has_offers.status,has_offers.id idOffer')));
+        $offers = offer::ofShape($req->shapeId)->get();
+
+        foreach ($offers as $key => $offer) {
+            $hasOffer = hasOffer::where('id_color', $req->colorId)->where('id_offer', $offer->id)->first();
+            if ($hasOffer) {
+                $offer->id_color = $hasOffer->id_color;
+                $offer->path = FilesController::path($hasOffer->id_image);
+                $offer->status = $hasOffer->status;
+                $offer->idOffer = $offer->id;
+            }
+
+        }
+
         $sizes = size::ofColor($color->id)->get();
         return response()->json([
             'landing' => $landing,

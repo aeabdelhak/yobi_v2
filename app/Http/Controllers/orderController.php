@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Enums\orderStatus as EnumsOrderStatus;
 use App\Enums\permissions;
+use App\Enums\sharedStatus;
 use App\Models\color;
 use App\Models\detail;
 use App\Models\hasOffer;
@@ -12,6 +13,7 @@ use App\Models\offer;
 use App\Models\order;
 use App\Models\orderChange;
 use App\Models\shape;
+use App\Models\shippServices;
 use App\Models\store;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -23,6 +25,23 @@ class orderController extends Controller
         $this->middleware('auth:api', ['except' => ['newOrder']]);
         $this->middleware('permission:' . permissions::$orders, ['only' => ['getTotalPrice', 'getOrders', 'history', 'getOrderName', 'getStatistics', 'changeStatus']]);
         $this->middleware('permission:' . permissions::$delivery, ['only' => ['pushToDelivery']]);
+    }
+
+    public function edit(Request $req)
+    {
+
+        $order = order::find($req->id);
+        if (!$order) {
+            return res('fail', 'order not found');
+        }
+
+        $order->name = $req->name;
+        $order->address = $req->address;
+        $order->city = $req->city;
+        $order->phone = $req->phone;
+        $order->save();
+        return res('success', 'order updated successfully', $order->fresh());
+
     }
 
     public function getTotalPrice($id)
@@ -175,22 +194,22 @@ class orderController extends Controller
         } else {
             $date = null;
         }
-
-        if ($status != EnumsOrderStatus::$pushedToDelivery) {
-
-            $order->status = $status;
-            $order->status_date = $date;
-            $order->save();
-            $orderChange = new orderChange();
-            $orderChange->id_order = $id;
-            $orderChange->to_date = $date;
-            $orderChange->status = $status;
-            $orderChange->note = $req->note;
-            $orderChange->save();
-
-            return res('success', 'successfuly chnaged', $order->fresh());
-
+        $ship = shippServices::where('id_order', $id)->first();
+        if ($ship && $ship->status == sharedStatus::$active) {
+            $ship->status = sharedStatus::$inActive;
+            $ship->save();
         }
+        $order->status = $status;
+        $order->status_date = $date;
+        $order->save();
+        $orderChange = new orderChange();
+        $orderChange->id_order = $id;
+        $orderChange->to_date = $date;
+        $orderChange->status = $status;
+        $orderChange->note = $req->note;
+        $orderChange->save();
+
+        return res('success', 'successfuly chnaged', $order->fresh());
 
     }
     public function pushToDelivery(Request $req)

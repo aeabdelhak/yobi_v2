@@ -89,6 +89,7 @@ Route::controller(permissionController::class)->group(function () {
     Route::post('permission/forbid', 'forbid');
 });
 Route::controller(orderController::class)->group(function () {
+    Route::post('order/edit', 'edit');
     Route::post('order/submit', 'newOrder');
     Route::get('order/paginate', 'getOrders');
     Route::get('order/statistics', 'getStatistics');
