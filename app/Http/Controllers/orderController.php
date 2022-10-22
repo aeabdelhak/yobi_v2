@@ -227,15 +227,15 @@ class orderController extends Controller
         if ((new tawsilixController())->push(
             $id,
             $order->name,
-            $req->city,
+            $order->city,
             $order->address,
             $order->phone,
             $id_token,
             $this->getOrderName($id),
             1,
             $req->note,
-            $req->change,
-            $req->open,
+            0,
+            0,
             $this->getTotalPrice($id))) {
             $order->save();
             $orderChange = new orderChange();
