@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Enums\permissions;
+use App\Models\fbPixel;
 use App\Models\store;
 use App\Models\tawsilixAccess;
 use Illuminate\Http\Request;
@@ -44,6 +45,10 @@ class StoreController extends Controller
         $store->id_logo = FilesController::store($req->file('logo'));
         if ($store->save()) {
 
+            $pixel = new fbPixel();
+            $pixel->key = $req->key;
+            $pixel->id_store = $store->id;
+            $pixel->save();
             $store = store::leftjoin('files', 'files.id', '=', 'id_logo')->where('stores.id', $store->id)->first(DB::raw("stores.id  ,url ,stores.name,stores.created_at,description "));
 
             return [
