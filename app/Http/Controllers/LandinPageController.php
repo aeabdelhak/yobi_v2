@@ -78,7 +78,7 @@ class LandinPageController extends Controller
     public function client(Request $req)
     {
         $host = $req->header('host');
-        $landing = landingPage::where('domain', strtolower($host))->with(['poster', 'pallete', 'cards'])->firstorfail();
+        return $landing = landingPage::where('domain', strtolower($host))->with(['poster', 'pallete', 'cards'])->firstorfail();
         $store = store::find($landing->id_store);
         $store->pixel = fbPixel::where('id_store', $landing->id_store)->first();
         $store->logo = file::find($store->id_logo);
