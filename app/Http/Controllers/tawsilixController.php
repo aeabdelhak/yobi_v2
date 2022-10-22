@@ -8,7 +8,6 @@ use App\Models\order;
 use App\Models\orderChange;
 use App\Models\shippServices;
 use App\Models\tawsilixAccess;
-use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 
 class tawsilixController extends Controller
@@ -116,7 +115,6 @@ class tawsilixController extends Controller
                 $orderChange = new orderChange();
                 $orderChange->id_order = $order->id_order;
                 $orderChange->status = $status;
-                $orderChange->created_at = Carbon::createFromTimestamp($res["0"]['eventdate'])->toDateTimeString();
                 $orderChange->save();
             }
 
