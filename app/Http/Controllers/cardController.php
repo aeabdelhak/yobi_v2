@@ -52,4 +52,13 @@ class cardController extends Controller
         return false;
 
     }
+
+    public function edit(Request $req)
+    {
+        card::where('id', $req->id)->update($req->all());
+        return response()->json([
+            'status' => 'Success',
+            'data' => card::where('id', $req->id)->first(),
+        ]);
+    }
 }

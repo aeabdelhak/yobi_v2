@@ -55,7 +55,7 @@ Route::controller(shapesController::class)->group(function () {
     Route::get('shape', 'get');
     Route::post('shape', 'newShape');
     Route::delete('shape', 'delete');
-    Route::put('shape', 'edit');
+    Route::put('shape/edit', 'edit');
     Route::post('shape/toggleStatus', 'toggleStatus');
 });
 Route::controller(colorsController::class)->group(function () {
@@ -73,6 +73,7 @@ Route::controller(sizesController::class)->group(function () {
 Route::controller(cardController::class)->group(function () {
     Route::get('card', 'get');
     Route::post('card', 'newCard');
+    Route::put('card', 'edit');
     Route::delete('card', 'delete');
 });
 Route::controller(audioController::class)->group(function () {
