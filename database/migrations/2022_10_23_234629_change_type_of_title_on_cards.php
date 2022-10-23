@@ -14,7 +14,7 @@ return new class extends Migration
     public function up()
     {
         Schema::table('cards', function (Blueprint $table) {
-            $table->text('body')->change();
+            $table->text('title')->change();
         });
     }
 
