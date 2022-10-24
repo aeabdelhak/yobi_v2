@@ -33,12 +33,13 @@ class offerController extends Controller
 
         $image = FilesController::store($req->image);
         $hasOffer = new hasOffer();
+
         $hasOffer->id_offer = $offer;
         $hasOffer->id_image = $image;
         $hasOffer->id_color = $color;
         $hasOffer->save();
 
-        $offer = offer::join('has_offers', 'has_offers.id_offer', 'offers.id')->join('files', 'files.id', 'has_offers.id_image')->where('id_color', $color)->get(DB::raw(('id_color,path,offers.id,promotioned_price,original_price,label,has_offers.status,has_offers.id idOffer')))[0];
+        $offer = offer::join('has_offers', 'has_offers.id_offer', 'offers.id')->join('files', 'files.id', 'has_offers.id_image')->where('id_color', $color)->where('has_offers.id', $hasOffer->id)->get(DB::raw(('id_color,path,offers.id,promotioned_price,original_price,label,has_offers.status,has_offers.id idOffer')))[0];
 
         return res('success', 'successfully created', $offer);
 

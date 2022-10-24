@@ -59,7 +59,7 @@ class FilesController extends Controller
     }
     public static function path($id)
     {
-        return file::find($id)->value('path');
+        return file::where('id', $id)->value('path');
     }
 
 }
