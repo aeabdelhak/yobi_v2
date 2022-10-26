@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class store extends Model
 {
+    use HasFactory;
     protected $fillable = [
         'id',
         'name',
@@ -16,11 +17,19 @@ class store extends Model
         'token',
         'sucret_token',
         'id_logo',
+        'domain',
+        'facebook',
+        'tiktok',
 
     ];
     protected $hidden = [
         'token',
         'sucret_token',
     ];
-    use HasFactory;
+
+    public function icon()
+    {
+        return $this->hasOne(file::class, 'id', 'id_logo');
+    }
+
 }

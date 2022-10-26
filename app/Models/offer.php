@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\sharedStatus;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -14,13 +15,13 @@ class offer extends Model
         'original_price',
         'promotioned_price',
         'status',
-        'id_shape',
+        'id_landing_page',
         'id_image',
 
     ];
 
-    public function scopeOfShape($query, $id)
+    public function scopeOflanding($query, $id)
     {
-        $query->where('id_shape', $id);
+        $query->where('id_landing_page', $id)->where('status', '!=', sharedStatus::$deleted);
     }
 }

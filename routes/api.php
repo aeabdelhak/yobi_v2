@@ -30,7 +30,7 @@ Route::controller(AuthController::class)->group(function () {
 });
 Route::controller(StoreController::class)->group(function () {
     Route::post('store/new', 'newStore');
-    Route::get('store/get ', 'get');
+    Route::get('store/get ', 'only');
     Route::get('store/all', 'All');
     Route::delete('store/delete', 'delete');
     Route::post('store/edit', 'edit');
@@ -38,7 +38,7 @@ Route::controller(StoreController::class)->group(function () {
 });
 Route::controller(colorPalleteController::class)->group(function () {
     Route::post('pallete/new', 'newPallete');
-    Route::get('store/get ', 'get');
+    Route::get('pallete/get ', 'get');
     Route::get('pallete/all', 'All');
     Route::delete('pallete/delete', 'delete');
     Route::post('pallete/edit', 'edit');
@@ -46,10 +46,11 @@ Route::controller(colorPalleteController::class)->group(function () {
 Route::controller(LandinPageController::class)->group(function () {
     Route::get('landing/client', 'client');
     Route::get('landing/all', 'all');
+    Route::get('landing/only', 'only');
     Route::get('landing', 'get');
     Route::post('landing', 'newLanding');
     Route::delete('landing', 'delete');
-    Route::put('landing', 'edit');
+    Route::post('landing/edit', 'edit');
 });
 Route::controller(shapesController::class)->group(function () {
     Route::get('shape', 'get');
@@ -60,6 +61,8 @@ Route::controller(shapesController::class)->group(function () {
 });
 Route::controller(colorsController::class)->group(function () {
     Route::get('color', 'get');
+    Route::delete('color', 'delete');
+    Route::post('color/edit', 'edit');
     Route::post('color', 'newColor');
     Route::post('color/toggleStatus', 'toggleStatus');
 });
@@ -67,6 +70,7 @@ Route::controller(sizesController::class)->group(function () {
     Route::get('size', 'get');
     Route::post('size', 'newSize');
     Route::put('size', 'edit');
+    Route::delete('size', 'delete');
     Route::post('size/toggleStatus', 'toggleStatus');
 
 });
@@ -101,6 +105,8 @@ Route::controller(orderController::class)->group(function () {
 });
 Route::controller(offerController::class)->group(function () {
     Route::post('offer', 'newOffer');
+    Route::put('offer', 'edit');
+    Route::delete('offer', 'delete');
     Route::post('offer/assign', 'assign');
     Route::post('offer/activate', 'setActive');
     Route::post('offer/desactivate', 'setInActive');

@@ -16,7 +16,7 @@ class offerController extends Controller
         $offer->label = $req->label;
         $offer->original_price = $req->original_price;
         $offer->promotioned_price = $req->promotioned_price;
-        $offer->id_shape = $req->id;
+        $offer->id_landing_page = $req->id;
         $offer->save();
         return response()->json(['status' => 'success', 'data' => $offer]);
 
@@ -33,7 +33,6 @@ class offerController extends Controller
 
         $image = FilesController::store($req->image);
         $hasOffer = new hasOffer();
-
         $hasOffer->id_offer = $offer;
         $hasOffer->id_image = $image;
         $hasOffer->id_color = $color;
@@ -58,5 +57,16 @@ class offerController extends Controller
         $hasOffer->status = sharedStatus::$inActive;
         $hasOffer->save();
         return res('success', 'desactivaed', true);
+    }
+
+    public function edit(Request $req)
+    {
+        $offer = offer::whereid($req->id)->update($req->all());
+        return res('success', 'offer updated successfully', offer::find($req->id));
+    }
+    public function delete(Request $req)
+    {
+        $offer = offer::whereid($req->id)->update(['status' => sharedStatus::$deleted]);
+        return res('success', 'offer successfully deleted ', $offer);
     }
 }

@@ -46,4 +46,11 @@ class sizesController extends Controller
             'data' => size::where('id', $req->id)->first(),
         ]);
     }
+
+    public function delete(Request $req)
+    {
+        size::whereid($req->id)->update(['status' => sharedStatus::$deleted]);
+        return res('success', 'color successfully deleted ', true);
+    }
+
 }

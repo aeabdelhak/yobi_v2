@@ -6,7 +6,7 @@ use App\Enums\permissions;
 use App\Enums\sharedStatus;
 use App\Models\audio;
 use App\Models\card;
-use App\Models\fbPixel;
+use App\Models\colorPalette;
 use App\Models\file;
 use App\Models\landingPage;
 use App\Models\offer;
@@ -34,6 +34,7 @@ class LandinPageController extends Controller
         $landing = landingPage::findorfail($req->id);
         $shapes = shape::landing($landing->id)->get();
         $cards = card::ofLanding($landing->id)->get();
+        $offers = offer::ofLanding($landing->id)->get();
         $audios = audio::leftjoin('files', 'files.id', 'id_file')->where('id_landing_page', $req->id)->get(DB::raw('owner,audio.id,url,path'));
         $results = userResult::join('files', 'files.id', 'user_results.id_image')->where('id_landing_page', $landing->id)->get(DB::raw('*,user_results.id as id'));
 
@@ -43,25 +44,38 @@ class LandinPageController extends Controller
             'cards' => $cards,
             'audios' => $audios,
             'results' => $results,
+            'offers' => $offers,
         ]);
 
     }
+
+    public function only(Request $req)
+    {
+        $landing = landingPage::where('status', '!=', sharedStatus::$deleted)->where('id', $req->id)->firstorfail();
+        $palletes = colorPalette::all();
+        return compact('landing', 'palletes');
+    }
+
     public function all(Request $req)
     {
-        return landingPage::where('id_store', $req->id)->get();
+        return landingPage::where('status', '!=', sharedStatus::$deleted)->where('id_store', $req->id)->get();
 
     }
 
     public function newLanding(Request $req)
     {
-        if (landingPage::whereDomain($req->domain)->first()) {
+
+        $store = store::findorfail($req->id_store);
+        $fulldomain = strtolower(trim($req->domain . '.' . $store->domain));
+
+        if (landingPage::whereDomain($fulldomain)->first()) {
             return res('fail', 'the domain is already connected to another landing page', null);
         }
 
         $landingPage = new landingPage();
         $landingPage->name = $req->name;
         $landingPage->description = $req->description;
-        $landingPage->domain = strtolower($req->domain);
+        $landingPage->domain = $fulldomain;
         $landingPage->product_description = $req->product_description;
         $landingPage->product_name = $req->product_name;
         $landingPage->id_store = $req->id_store;
@@ -69,7 +83,10 @@ class LandinPageController extends Controller
         $landingPage->id_pallete = $req->id_pallete;
         if ($landingPage->save()) {
             try {
-                (new vercelController())->domainAdd($landingPage->domain);
+                if (env('APP_ENV') !== 'local') {
+                    (new vercelController())->domainAdd($landingPage->domain);
+                }
+
             } catch (Throwable $r) {}
             return res('Success', 'successfuly', $landingPage);
         }
@@ -78,9 +95,9 @@ class LandinPageController extends Controller
     public function client(Request $req)
     {
         $domain = $req->domain;
-        $landing = landingPage::where('domain', strtolower($domain))->with(['poster', 'pallete', 'cards'])->firstorfail();
+
+        $landing = landingPage::where('domain', strtolower($domain))->orwhere('id', $req->id)->with(['poster', 'pallete', 'cards'])->firstorfail();
         $store = store::find($landing->id_store);
-        $store->pixel = fbPixel::where('id_store', $landing->id_store)->first();
         $store->logo = file::find($store->id_logo);
         $landing->audios = audio::leftjoin('files', 'files.id', 'id_file')->where('id_landing_page', $landing->id)->get(DB::raw('owner,audio.id,url,path'));
         foreach ($landing->shapes as $key => $shape) {
@@ -115,10 +132,48 @@ class LandinPageController extends Controller
         $landingPage->domain = "{deleted-$landingPage->id}" . $landingPage->domain;
         if ($landingPage->save()) {
             try {
-                (new vercelController())->domainRemove($domain);
+                if (env('APP_ENV') !== 'local') {
+                    (new vercelController())->domainRemove($domain);
+                }
+
             } catch (Throwable $r) {}
         }
-        return res('Success', 'successfuly', $landingPage);
+        return res('success', 'successfuly', $landingPage);
+
+    }
+    public function edit(Request $req)
+    {
+        $landingPage = landingPage::findorfail($req->id);
+
+        $storeDomain = store::find($landingPage->id_store)->value('domain');
+        $fulldomain = strtolower(trim($storeDomain . '.' . $req->domain));
+
+        if (landingPage::where('id', '!=', $req->id)->whereDomain($fulldomain)->first()) {
+            return res('fail', 'the domain is already connected to another landing page', null);
+        }
+
+        $hasFile = $req->hasFile('poster');
+        $oldDomain = $landingPage->domain;
+        $landingPage->name = $req->name;
+        $landingPage->domain = $fulldomain;
+        $landingPage->description = $req->description;
+        $landingPage->product_description = $req->product_description;
+        $landingPage->product_name = $req->product_name;
+
+        $oldposter = $landingPage->id_poster;
+
+        $landingPage->id_poster = $hasFile ? FilesController::store($req->poster) : $oldposter;
+
+        $landingPage->save();
+        if ($hasFile) {
+            FilesController::delete($oldposter);
+        }
+        if ($landingPage->domain != $oldDomain && env('APP_ENV') != 'local') {
+            (new vercelController())->domainRemove($oldDomain);
+            (new vercelController())->domainAdd($landingPage->domain);
+        }
+
+        return res('success', 'successfully updated', true);
 
     }
 

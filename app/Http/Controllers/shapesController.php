@@ -6,7 +6,6 @@ use App\Enums\permissions;
 use App\Enums\sharedStatus;
 use App\Models\color;
 use App\Models\landingPage;
-use App\Models\offer;
 use App\Models\shape;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -31,7 +30,7 @@ class shapesController extends Controller
         if ($shape->save()) {
             return response()->json([
                 'status' => "Success",
-                'data' => $shape,
+                'data' => $shape->refresh(),
             ]);
         }}
 
@@ -40,12 +39,10 @@ class shapesController extends Controller
         $landing = landingPage::findorfail($req->id);
         $shape = shape::landing($req->id)->whereid($req->shapeId)->firstorfail();
         $colors = color::leftJoin('files', 'files.id', 'id_image')->ofshape($shape->id)->get(DB::raw('colors.name,color_code,colors.id,url,status'));
-        $offers = offer::ofshape($shape->id)->get();
         return response()->json([
             'landing' => $landing,
             'shape' => $shape,
             'colors' => $colors,
-            'offers' => $offers,
         ]);
     }
     public function edit(Request $req)
@@ -66,5 +63,11 @@ class shapesController extends Controller
             'status' => 'Success',
             'data' => $shape,
         ]);
+    }
+
+    public function delete(Request $req)
+    {
+        shape::whereid($req->id)->update(['status' => sharedStatus::$deleted]);
+        return res('success', 'shape successfully deleted ', true);
     }
 }

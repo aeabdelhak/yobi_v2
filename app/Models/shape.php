@@ -29,7 +29,7 @@ class shape extends Model
     }
     public function scopeLanding($query, $id)
     {
-        return $query->where('id_landing_page', $id);
+        return $query->where('id_landing_page', $id)->where('status', '!=', sharedStatus::$deleted);
     }
 
 }

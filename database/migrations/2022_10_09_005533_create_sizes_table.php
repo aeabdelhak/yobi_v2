@@ -21,7 +21,7 @@ return new class extends Migration
             $table->unsignedBigInteger('id_shape');
             $table->foreign('id_shape')->references('id')->on('shapes')->onDelete('cascade');
             $table->unsignedBigInteger('id_color')->nullable();
-            $table->foreign('id_color')->references('id')->on('files');
+            $table->foreign('id_color')->references('id')->on('colors');
             $table->timestamps();
         });
     }
