@@ -147,7 +147,7 @@ class LandinPageController extends Controller
     {
         $landingPage = landingPage::findorfail($req->id);
 
-        $store = store::find($landingPage->id_store)->first();
+        $store = store::whereid($landingPage->id_store)->first();
         $fulldomain = strtolower(trim($req->domain . '.' . $store->domain));
 
         if (landingPage::where('id', '!=', $req->id)->whereDomain($fulldomain)->first()) {
