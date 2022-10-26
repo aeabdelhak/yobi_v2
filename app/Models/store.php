@@ -15,16 +15,12 @@ class store extends Model
         'link',
         'status',
         'token',
-        'sucret_token',
+        'secret_token',
         'id_logo',
         'domain',
         'facebook',
         'tiktok',
 
-    ];
-    protected $hidden = [
-        'token',
-        'sucret_token',
     ];
 
     public function icon()

@@ -98,6 +98,8 @@ class LandinPageController extends Controller
 
         $landing = landingPage::where('domain', strtolower($domain))->orwhere('id', $req->id)->with(['poster', 'pallete', 'cards'])->firstorfail();
         $store = store::find($landing->id_store);
+        $store->token = null;
+        $store->secret_token = null;
         $store->logo = file::find($store->id_logo);
         $landing->audios = audio::leftjoin('files', 'files.id', 'id_file')->where('id_landing_page', $landing->id)->get(DB::raw('owner,audio.id,url,path'));
         foreach ($landing->shapes as $key => $shape) {
