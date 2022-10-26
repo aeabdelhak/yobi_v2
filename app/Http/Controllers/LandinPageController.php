@@ -159,6 +159,7 @@ class LandinPageController extends Controller
         $landingPage->name = $req->name;
         $landingPage->domain = $fulldomain;
         $landingPage->description = $req->description;
+        $landingPage->id_pallete = $req->id_pallete;
         $landingPage->product_description = $req->product_description;
         $landingPage->product_name = $req->product_name;
 
