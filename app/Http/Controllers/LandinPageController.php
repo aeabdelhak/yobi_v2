@@ -148,7 +148,7 @@ class LandinPageController extends Controller
         $landingPage = landingPage::findorfail($req->id);
 
         $storeDomain = store::find($landingPage->id_store)->value('domain');
-        $fulldomain = strtolower(trim($storeDomain . '.' . $req->domain));
+        $fulldomain = strtolower(trim($req->domain . '.' . $storeDomain));
 
         if (landingPage::where('id', '!=', $req->id)->whereDomain($fulldomain)->first()) {
             return res('fail', 'the domain is already connected to another landing page', null);
