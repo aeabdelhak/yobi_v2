@@ -32,7 +32,7 @@ $this->middleware('permission:' . permissions::$landing, ['only' => ['newColor',
         $offers = offer::Oflanding($req->id)->get();
 
         foreach ($offers as $key => $offer) {
-            $hasOffer = hasOffer::where('id_color', $req->colorId)->first();
+            $hasOffer = hasOffer::where('id_color', $req->colorId)->where('id_offer', $req->offer->id)->first();
             if ($hasOffer) {
                 $offer->path = FilesController::path($hasOffer->id_image);
                 $offer->id_color = $hasOffer->id;
