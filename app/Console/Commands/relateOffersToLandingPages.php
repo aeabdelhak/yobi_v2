@@ -33,7 +33,7 @@ class relateOffersToLandingPages extends Command
         $all = hasOffer::join('colors', 'colors.id', 'has_offers.id_color')->join('shapes', 'shapes.id', 'colors.id_shape')->get(DB::raw('shapes.id,id_landing_page'));
 
         foreach ($all as $key => $offer) {
-            offer::where('id', $offer->id)->update(['id_landing_page' => $offer]);
+            offer::where('id', $offer->id)->update(['id_landing_page' => $offer->id_landing_page]);
             echo $key . ' ----> done ';
         }
         return Command::SUCCESS;
