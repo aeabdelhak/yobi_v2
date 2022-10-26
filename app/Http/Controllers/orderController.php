@@ -14,7 +14,6 @@ use App\Models\order;
 use App\Models\orderChange;
 use App\Models\shape;
 use App\Models\shippServices;
-use App\Models\store;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -216,7 +215,6 @@ class orderController extends Controller
     {
         $id = $req->id;
         $order = order::find($id);
-        $id_token = store::join('landing_pages', 'landing_pages.id_store', 'stores.id')->join('orders', 'landing_pages.id', 'orders.id_landing_page')->join('tawsilix_accesses', 'tawsilix_accesses.id', 'stores.id_token')->where('orders.id', $id)->value('id_token');
 
         if ($order->status === EnumsOrderStatus::$pushedToDelivery) {
             return res('fail', 'this order is already pushed');
@@ -230,7 +228,7 @@ class orderController extends Controller
             $order->city,
             $order->address,
             $order->phone,
-            $id_token,
+            $id,
             $this->getOrderName($id),
             1,
             $req->note,

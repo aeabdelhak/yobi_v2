@@ -7,7 +7,7 @@ use App\Enums\sharedStatus;
 use App\Models\order;
 use App\Models\orderChange;
 use App\Models\shippServices;
-use App\Models\tawsilixAccess;
+use App\Models\store;
 use Illuminate\Support\Facades\DB;
 
 class tawsilixController extends Controller
@@ -39,13 +39,11 @@ class tawsilixController extends Controller
         int $openpackage,
         $price) {
 
-        $tokens = tawsilixAccess::find($id_token);
-        $tk = $tokens->token;
-        $sk = $tokens->secret_token;
+        $tokens = store::join('landing_pages', 'landing_pages.id_store', 'stores.id')->join('orders', 'orders.id_landing_page', 'landing_pages.id')->first(['token', 'secret_token']);
 
         $data = array(
-            'tk' => $tk,
-            'sk' => $sk,
+            'tk' => $tokens->token,
+            'sk' => $tokens->secret_token,
             'fullname' => $fullName,
             'phone' => $phone,
             "city" => $city,
