@@ -112,7 +112,7 @@ class orderController extends Controller
             $detail->price = $offer_price ?? $shape_price;
             $detail->save();
 
-            $res = $req->id != null ? $order->refresh() : true;
+            $res = $req->admin != null ? $order->refresh() : true;
 
             return response()->json(['status' => 'success', 'data' => $res]);
         }
