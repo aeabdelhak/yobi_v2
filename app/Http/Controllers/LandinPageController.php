@@ -172,7 +172,7 @@ class LandinPageController extends Controller
         }
         if ($landingPage->domain != $oldDomain && env('APP_ENV') != 'local') {
             (new vercelController())->domainRemove($oldDomain);
-            (new vercelController())->domainAdd($landingPage->domain);
+            (new vercelController())->domainAdd($fulldomain);
         }
 
         return res('success', 'successfully updated', true);
