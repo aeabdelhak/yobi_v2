@@ -15,7 +15,7 @@ class shapesController extends Controller
     public function __construct()
     {
         $this->middleware('auth:api');
-        $this->middleware('permission:' . permissions::$landing, ['only' => ['newShape', 'edit', 'toggleStatus']]);
+        $this->middleware('permission:' . permissions::$landing);
 
     }
 

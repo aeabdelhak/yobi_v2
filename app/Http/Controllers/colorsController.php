@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\permissions;
 use App\Enums\sharedStatus;
 use App\Models\color;
 use App\Models\hasOffer;
@@ -15,12 +16,12 @@ use Illuminate\Support\Facades\DB;
 class colorsController extends Controller
 {
 
-/*     public function __construct()
-{
-$this->middleware('auth:api');
-$this->middleware('permission:' . permissions::$landing, ['only' => ['newColor', 'toggleStatus']]);
+    public function __construct()
+    {
+        $this->middleware('auth:api');
+        $this->middleware('permission:' . permissions::$landing);
 
-} */
+    }
 
     public function get(Request $req)
     {

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\permissions;
 use App\Enums\sharedStatus;
 use App\Models\hasOffer;
 use App\Models\offer;
@@ -10,6 +11,12 @@ use Illuminate\Support\Facades\DB;
 
 class offerController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('auth:api', ['except' => ['client']]);
+        $this->middleware('permission:' . permissions::$landing);
+
+    }
     public function newOffer(Request $req)
     {
         $offer = new offer();

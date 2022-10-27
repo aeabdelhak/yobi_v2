@@ -14,7 +14,7 @@ class StoreController extends Controller
     public function __construct()
     {
         $this->middleware('auth:api');
-        $this->middleware('permission:' . permissions::$store, ['only' => ['edit', 'new']]);
+        $this->middleware('permission:' . permissions::$store, ['except' => ['all']]);
 
     }
     public function get($id)

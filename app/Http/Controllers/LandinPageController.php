@@ -24,7 +24,7 @@ class LandinPageController extends Controller
     public function __construct()
     {
         $this->middleware('auth:api', ['except' => ['client']]);
-        $this->middleware('permission:' . permissions::$landing, ['only' => ['get', 'all', 'newLanding']]);
+        $this->middleware('permission:' . permissions::$landing, ['except' => ['client']]);
 
     }
 

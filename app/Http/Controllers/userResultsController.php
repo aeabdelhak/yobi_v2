@@ -2,12 +2,20 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\permissions;
 use App\Models\userResult;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
 class userResultsController extends Controller
 {
+
+    public function __construct()
+    {
+        $this->middleware('auth:api');
+        $this->middleware('permission:' . permissions::$landing);
+
+    }
     public function newResult(Request $req)
     {
         $result = new userResult();

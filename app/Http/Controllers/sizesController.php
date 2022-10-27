@@ -13,7 +13,7 @@ class sizesController extends Controller
     public function __construct()
     {
         $this->middleware('auth:api');
-        $this->middleware('permission:' . permissions::$landing, ['only' => ['newSize', 'edit', 'toggleStatus']]);
+        $this->middleware('permission:' . permissions::$landing);
 
     }
 
