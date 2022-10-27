@@ -225,20 +225,6 @@ class orderController extends Controller
 
         $order->status = EnumsOrderStatus::$pushedToDelivery;
 
-        return (new tawsilixController())->push(
-            $id,
-            $order->name,
-            $order->city,
-            $order->address,
-            $order->phone,
-            $id,
-            $this->getOrderName($id),
-            1,
-            $req->note,
-            0,
-            0,
-            $this->getTotalPrice($id));
-
         if ((new tawsilixController())->push(
             $id,
             $order->name,

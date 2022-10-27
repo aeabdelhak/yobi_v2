@@ -39,7 +39,7 @@ class tawsilixController extends Controller
         int $openpackage,
         $price) {
 
-        return $tokens = store::join('landing_pages', 'landing_pages.id_store', 'stores.id')->join('orders', 'orders.id_landing_page', 'landing_pages.id')->where('orders.id', $idOrder)->first(['token', 'secret_token']);
+        $tokens = store::join('landing_pages', 'landing_pages.id_store', 'stores.id')->join('orders', 'orders.id_landing_page', 'landing_pages.id')->where('orders.id', $idOrder)->first(['token', 'secret_token']);
 
         $data = array(
             'tk' => $tokens->token,
