@@ -31,7 +31,7 @@ class tawsilixController extends Controller
         $city,
         $address,
         $phone,
-        int $id_token,
+        int $idOrder,
         $product,
         int $qty,
         $note,
@@ -39,7 +39,7 @@ class tawsilixController extends Controller
         int $openpackage,
         $price) {
 
-        $tokens = store::join('landing_pages', 'landing_pages.id_store', 'stores.id')->join('orders', 'orders.id_landing_page', 'landing_pages.id')->first(['token', 'secret_token']);
+        return $tokens = store::join('landing_pages', 'landing_pages.id_store', 'stores.id')->join('orders', 'orders.id_landing_page', 'landing_pages.id')->where('orders.id', $idOrder)->first(['token', 'secret_token']);
 
         $data = array(
             'tk' => $tokens->token,
@@ -56,7 +56,7 @@ class tawsilixController extends Controller
             "openpackage" => $openpackage,
         );
 
-        return $path = '/addcolis.php?' . http_build_query($data);
+        $path = '/addcolis.php?' . http_build_query($data);
 
         $req = $this->callapi($path);
         if (isset($req->code)) {
