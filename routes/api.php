@@ -26,6 +26,10 @@ Route::controller(AuthController::class)->group(function () {
     Route::post('refresh', 'refresh');
     Route::get('user/all', 'all');
     Route::get('user/{id}', 'get');
+    Route::post('user/avatar', 'avatarUpload');
+    Route::put('user/name', 'editName');
+    Route::put('user/password', '
+    ');
 
 });
 Route::controller(StoreController::class)->group(function () {

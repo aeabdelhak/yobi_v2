@@ -61,5 +61,9 @@ class FilesController extends Controller
     {
         return file::where('id', $id)->value('path');
     }
+    public static function url($id)
+    {
+        return file::where('id', $id)->value('url');
+    }
 
 }

@@ -252,7 +252,7 @@ class orderController extends Controller
     }
     public function history($id)
     {
-        return orderChange::leftjoin('users', 'users.id', 'order_changes.id_user')->orderby('order_changes.created_at', 'desc')->oforder($id)->get(DB::raw('order_changes.status,note,name,email,order_changes.created_at date ,to_date'));
+        return orderChange::leftjoin('users', 'users.id', 'order_changes.id_user')->leftjoin('files', 'users.id_avatar', 'files.id')->orderby('order_changes.created_at', 'desc')->oforder($id)->get(DB::raw('order_changes.status,note,users.name,email,order_changes.created_at date ,to_date ,url avatar'));
 
     }
 

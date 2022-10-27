@@ -38,6 +38,7 @@ class AuthController extends Controller
         }
 
         $user = Auth::user();
+        $user->avatar = FilesController::url($user->id_avatar);
         $user->permissions = Auth::user()->permissions();
         return response()->json([
             'status' => 'success',
@@ -105,14 +106,16 @@ class AuthController extends Controller
 
     public function user()
     {
+        $user = Auth::user();
+        $user->avatar = FilesController::url($user->id_avatar);
         return response()->json([
             'status' => 'success',
-            'user' => Auth::user(),
+            'user' => $user,
         ]);
     }
     public function all()
     {
-        return User::all();
+        return User::leftjoin('files', 'files.id', 'users.id_avatar')->get(DB::raw('users.id,users.name,email,url avatar'));
 
     }
     public function get($id)
@@ -126,6 +129,50 @@ class AuthController extends Controller
     public function refresh()
     {
         return response()->json(Auth::refresh());
+    }
+    public function avatarUpload(Request $req)
+    {
+
+        $user = Auth::user();
+        $oldAvatar = $user->id_avatar;
+        $user->id_avatar = FilesController::store($req->image);
+        $user->save();
+        if ($oldAvatar) {
+            FilesController::delete($oldAvatar);
+        }
+        return res('success', 'avatar updated successfuly', FilesController::url(($user->id_avatar)));
+
+    }
+    public function editName(Request $req)
+    {
+
+        $user = Auth::user();
+        $user->name = $req->name;
+        $user->save();
+
+        return res('success', 'name updated successfuly', $user->name);
+
+    }
+    public function editpassword(Request $req)
+    {
+
+        $user = Auth::user();
+        $check = Hash::check($req->password, $user->password);
+        if (!$check) {
+            return res('fail', 'password incorrect !');
+        }
+        if (strlen($req->new_password) < 8) {
+            return res('fail', 'new password must contain at least 8 characters');
+        }
+        if ($req->confirmation_password !== $req->new_password) {
+            return res('fail', 'passwords do not match');
+        }
+
+        $user->password = hash::make($req->new_password);
+        $user->save();
+
+        return res('success', 'password updated successfuly', $user->name);
+
     }
 
 }
