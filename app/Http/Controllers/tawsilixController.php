@@ -51,7 +51,7 @@ class tawsilixController extends Controller
             "price" => $price,
             "product" => $product,
             "qty" => $qty,
-            "note" => $note ?? '',
+            "note" => $note ?? '..',
             "change" => $change,
             "openpackage" => $openpackage,
         );
