@@ -18,10 +18,11 @@ class EnsurePermission
     public function handle(Request $request, Closure $next, $code)
     {
         $permissions = Auth::user()->permissions()->toArray();
+        return response([$code, $permissions]);
         if (in_array($code, $permissions)) {
             return $next($request);
         }
-        return response()->status(101);
+        return response(null, 401);
 
     }
 }

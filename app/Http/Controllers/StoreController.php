@@ -14,7 +14,7 @@ class StoreController extends Controller
     public function __construct()
     {
         $this->middleware('auth:api');
-        $this->middleware('permission:' . permissions::$store, ['except' => ['all']]);
+        $this->middleware('permission:' . permissions::$store, ['except' => ['allStores']]);
 
     }
     public function get($id)
@@ -77,7 +77,7 @@ class StoreController extends Controller
 
         return res('success', 'updated suuccessfuly', true);
     }
-    public function all()
+    public function allStores()
     {
 
         return store::leftjoin('files', 'files.id', '=', 'id_logo')

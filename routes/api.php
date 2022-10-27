@@ -36,7 +36,7 @@ Route::controller(AuthController::class)->group(function () {
 Route::controller(StoreController::class)->group(function () {
     Route::post('store/new', 'newStore');
     Route::get('store/get ', 'only');
-    Route::get('store/all', 'All');
+    Route::get('store/all', 'allStores');
     Route::delete('store/delete', 'delete');
     Route::post('store/edit', 'edit');
 
