@@ -7,6 +7,7 @@ class sharedStatus
 
     public static $active = 1;
     public static $inActive = 2;
+    public static $hidden = 98;
     public static $deleted = 99;
 
 }

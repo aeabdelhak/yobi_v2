@@ -28,8 +28,9 @@ Route::controller(AuthController::class)->group(function () {
     Route::get('user/{id}', 'get');
     Route::post('user/avatar', 'avatarUpload');
     Route::put('user/name', 'editName');
-    Route::put('user/password', '
-    ');
+    Route::put('user/password', 'editpassword');
+    Route::put('user/status', 'changeStatus');
+    Route::delete('user/{id}', 'delete');
 
 });
 Route::controller(StoreController::class)->group(function () {

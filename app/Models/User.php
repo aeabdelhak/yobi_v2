@@ -58,7 +58,7 @@ class User extends Authenticatable implements JWTSubject
 
     public function getPermissions()
     {
-        return static::join('has_permissions', 'users.id', 'has_permissions.id_user')->join('permissions', 'has_permissions.id_permission', 'permissions.id')->pluck('code');
+        return static::join('has_permissions', 'users.id', 'has_permissions.id_user')->join('permissions', 'has_permissions.id_permission', 'permissions.id')->where('users.id', $this->id)->pluck('code');
     }
     public function Permissions()
     {
@@ -77,7 +77,6 @@ class User extends Authenticatable implements JWTSubject
      */
     public function getJWTCustomClaims()
     {
-
         return ['permissions' => $this->getPermissions()];
     }
 

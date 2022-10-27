@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Enums\permissions;
+use App\Enums\sharedStatus;
+use App\Models\hasPermission;
 use App\Models\permission;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -17,7 +19,7 @@ class AuthController extends Controller
     public function __construct()
     {
         $this->middleware('auth:api', ['except' => ['login']]);
-        $this->middleware('permission:' . permissions::$staff, ['only' => ['register', 'all', 'get']]);
+        $this->middleware('permission:' . permissions::$staff, ['only' => ['register', 'delete', 'changeStatus', 'all', 'get']]);
     }
 
     public function login(Request $request)
@@ -38,6 +40,14 @@ class AuthController extends Controller
         }
 
         $user = Auth::user();
+
+        if ($user->status == sharedStatus::$inActive) {
+            return res('fail', 'this account is desactivated');
+        }
+        if ($user->status == sharedStatus::$deleted) {
+            return res('fail', 'invalid credentials');
+        }
+
         $user->avatar = FilesController::url($user->id_avatar);
         $user->permissions = Auth::user()->permissions();
         return response()->json([
@@ -55,28 +65,55 @@ class AuthController extends Controller
     {
         $request->validate([
             'name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:users',
+            'email' => 'required|string|email|max:255',
         ]);
+
+        $user = User::where('email', $request->email)->first();
+
+        if ($user && $user->status !== sharedStatus::$deleted) {
+            return res('fail', 'there is already an account with this email');
+        }
 
         $random = str_shuffle('abcdefghjklmnopqrstuvwxyzABCDEFGHJKLMNOPQRSTUVWXYZ234567890!$%^&!$%^&');
         $password = substr($random, 0, 10);
 
-        $user = User::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'password' => Hash::make($password),
-        ]);
-
-        $permissions = permission::whereIn('code', $request->permissions)->pluck('id');
-
-        if ($permissions->count() != 0) {
-            $insert = [];
-            foreach ($permissions as $key => $permission) {
-                $insert[] = ['id_user' => $user->id, 'id_permission' => $permission, 'created_at' => now(), 'updated_at' => now()];
-
+        if ($user) {
+            $user->name = $request->name;
+            $user->status = sharedStatus::$active;
+            $user->password = Hash::make($password);
+            $avatar = $user->id_avatar;
+            $user->id_avatar = null;
+            $user->save();
+            FilesController::delete($avatar);
+            $permissions = permission::whereIn('code', $request->permissions)->pluck('id');
+            hasPermission::where('id_user', $user->id)->delete();
+            if ($permissions->count() != 0) {
+                $insert = [];
+                foreach ($permissions as $key => $permission) {
+                    $insert[] = ['id_user' => $user->id, 'id_permission' => $permission, 'created_at' => now(), 'updated_at' => now()];
+                }
+                DB::table('has_permissions')->insert($insert);
             }
-            DB::table('has_permissions')->insert($insert);
         }
+
+        if (!$user) {
+            $user = User::create([
+                'name' => $request->name,
+                'email' => $request->email,
+                'password' => Hash::make($password),
+            ]);
+
+            $permissions = permission::whereIn('code', $request->permissions)->pluck('id');
+
+            if ($permissions->count() != 0) {
+                $insert = [];
+                foreach ($permissions as $key => $permission) {
+                    $insert[] = ['id_user' => $user->id, 'id_permission' => $permission, 'created_at' => now(), 'updated_at' => now()];
+                }
+                DB::table('has_permissions')->insert($insert);
+            }
+        }
+
         $emailsent = (new SendEmailController())->welcome($request->email, $password);
 
         if (!$emailsent) {
@@ -115,12 +152,14 @@ class AuthController extends Controller
     }
     public function all()
     {
-        return User::leftjoin('files', 'files.id', 'users.id_avatar')->get(DB::raw('users.id,users.name,email,url avatar'));
+        return User::leftjoin('files', 'files.id', 'users.id_avatar')
+            ->whereNotIn('status', [sharedStatus::$deleted, sharedStatus::$hidden])->
+            get(DB::raw('users.id,users.name,email,url avatar'));
 
     }
     public function get($id)
     {
-        $user = User::findorfail($id);
+        $user = User::where('id', $id)->whereNotIn('status', [sharedStatus::$deleted, sharedStatus::$hidden])->firstorfail();
         $user->permissions = user::getAccess($id);
         return $user;
 
@@ -172,6 +211,24 @@ class AuthController extends Controller
         $user->save();
 
         return res('success', 'password updated successfuly', $user->name);
+
+    }
+
+    public function delete($id)
+    {
+        user::where('id', $id)->update(['status' => sharedStatus::$deleted]);
+        return res('success', 'user deleted successfuly', true);
+
+    }
+    public function changeStatus(Request $req)
+    {
+        $status = $req->status;
+        if (!in_array($status, [sharedStatus::$active, sharedStatus::$inActive])) {
+            return res('fail', 'incorrect status code');
+        }
+
+        user::where('id', $req->id)->update(['status' => $status]);
+        return res('success', 'status changed successfuly', true);
 
     }
 
