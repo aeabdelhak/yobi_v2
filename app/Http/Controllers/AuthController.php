@@ -19,7 +19,7 @@ class AuthController extends Controller
     public function __construct()
     {
         $this->middleware('auth:api', ['except' => ['login']]);
-        $this->middleware('permission:' . permissions::$staff, ['only' => ['register', 'delete', 'changeStatus', 'all', 'get']]);
+        $this->middleware('permission:' . permissions::$staff, ['except' => ['avatarUpload', 'editName', 'editpassword', 'login']]);
     }
 
     public function login(Request $request)
