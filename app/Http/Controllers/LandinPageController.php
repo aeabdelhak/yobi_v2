@@ -108,7 +108,7 @@ class LandinPageController extends Controller
             } else {
                 foreach ($shape->colors as $key => $color) {
                     $color->image = file::find($color->id_image);
-                    $color->offers = offer::join('has_offers', 'has_offers.id_offer', 'offers.id')->join('files', 'files.id', 'has_offers.id_image')->where('id_color', $color->id)->where('has_offers.status', sharedStatus::$active)->get(DB::raw(('id_color,path,offers.id,promotioned_price,original_price,label,has_offers.status,has_offers.id idOffer')));
+                    $color->offers = offer::join('has_offers', 'has_offers.id_offer', 'offers.id')->join('files', 'files.id', 'has_offers.id_image')->where('id_color', $color->id)->where('has_offers.status', sharedStatus::$active)->where('offers.status', sharedStatus::$active)->get(DB::raw(('id_color,path,offers.id,promotioned_price,original_price,label,has_offers.status,has_offers.id idOffer')));
                     $color->sizes = size::ofcolor($color->id)->where('status', sharedStatus::$active)->get();
                 }
             }
