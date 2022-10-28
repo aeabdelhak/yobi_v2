@@ -130,3 +130,6 @@ Route::controller(userResultsController::class)->group(function () {
 Route::controller(userResultsController::class)->group(function () {
     Route::delete('newResult/{id}', 'delete');
 });
+Route::fallback(function () {
+    return response()->json(null, 404);
+});
