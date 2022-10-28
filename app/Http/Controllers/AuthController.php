@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Auth as theAuth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use PHPOpenSourceSaver\JWTAuth\Facades\JWTAuth as Auth;
+use Throwable;
 
 class AuthController extends Controller
 {
@@ -159,7 +160,12 @@ class AuthController extends Controller
     }
     public function get($id)
     {
-        $user = User::where('id', $id)->whereNotIn('status', [sharedStatus::$deleted, sharedStatus::$hidden])->firstorfail();
+        try {
+            $user = User::where('id', $id)->whereNotIn('status', [sharedStatus::$deleted, sharedStatus::$hidden])->firstorfail();
+
+        } catch (Throwable $e) {
+            return response(null, 404);
+        }
         $user->permissions = user::getAccess($id);
         return $user;
 

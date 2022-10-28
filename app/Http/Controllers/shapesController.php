@@ -9,6 +9,7 @@ use App\Models\landingPage;
 use App\Models\shape;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Throwable;
 
 class shapesController extends Controller
 {
@@ -36,8 +37,13 @@ class shapesController extends Controller
 
     public function get(Request $req)
     {
-        $landing = landingPage::findorfail($req->id);
-        $shape = shape::landing($req->id)->whereid($req->shapeId)->firstorfail();
+        try {
+            $landing = landingPage::findorfail($req->id);
+            $shape = shape::landing($req->id)->whereid($req->shapeId)->firstorfail();
+        } catch (Throwable $e) {
+            return response(null, 404);
+        }
+
         $colors = color::leftJoin('files', 'files.id', 'id_image')->ofshape($shape->id)->get(DB::raw('colors.name,color_code,colors.id,url,status'));
         return response()->json([
             'landing' => $landing,

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Enums\permissions;
 use App\Models\card;
 use Illuminate\Http\Request;
+use Throwable;
 
 class cardController extends Controller
 {
@@ -35,7 +36,12 @@ class cardController extends Controller
     }
     public function get(Request $req)
     {
-        return card::findorfail($req->id);
+        try {
+            return card::findorfail($req->id);
+
+        } catch (Throwable $e) {
+            return response(null, 404);
+        }
 
     }
     public function all(Request $req)
@@ -45,6 +51,12 @@ class cardController extends Controller
 
     public function delete(Request $req)
     {
+        try {
+            $card = card::findorfail($req->id);
+
+        } catch (Throwable $e) {
+            return response(null, 404);
+        }
         $card = card::findorfail($req->id);
         if ($card->delete()) {
             return true;

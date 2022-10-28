@@ -12,6 +12,7 @@ use App\Models\shape;
 use App\Models\size;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Throwable;
 
 class colorsController extends Controller
 {
@@ -25,11 +26,15 @@ class colorsController extends Controller
 
     public function get(Request $req)
     {
+        try {
+            $landing = landingPage::findorfail($req->id);
 
-        $landing = landingPage::findorfail($req->id);
+            $shape = shape::landing($req->id)->where('id', $req->shapeId)->firstorfail();
+            $color = color::where('status', '!=', sharedStatus::$deleted)->where('colors.id', $req->colorId)->leftJoin('files', 'files.id', 'id_image')->ofshape($shape->id)->firstorfail(DB::raw('colors.name,color_code,colors.id,url,status'));
 
-        $shape = shape::landing($req->id)->where('id', $req->shapeId)->firstorfail();
-        $color = color::where('status', '!=', sharedStatus::$deleted)->where('colors.id', $req->colorId)->leftJoin('files', 'files.id', 'id_image')->ofshape($shape->id)->firstorfail(DB::raw('colors.name,color_code,colors.id,url,status'));
+        } catch (Throwable $e) {
+            return response(null, 404);
+        }
         $offers = offer::Oflanding($req->id)->get();
 
         foreach ($offers as $key => $offer) {
@@ -100,7 +105,7 @@ class colorsController extends Controller
             FilesController::delete($oldimage);
         }
 
-        $color = color::where('status', '!=', sharedStatus::$deleted)->where('colors.id', $req->id)->leftJoin('files', 'files.id', 'id_image')->firstorfail(DB::raw('colors.name,color_code,colors.id,url,status'));
+        $color = color::where('status', '!=', sharedStatus::$deleted)->where('colors.id', $req->id)->leftJoin('files', 'files.id', 'id_image')->first(DB::raw('colors.name,color_code,colors.id,url,status'));
 
         return res('success', 'successfully updated', $color);
 

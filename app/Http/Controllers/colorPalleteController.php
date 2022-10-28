@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Enums\permissions;
 use App\Models\colorPalette;
 use Illuminate\Http\Request;
+use Throwable;
 
 class colorPalleteController extends Controller
 {
@@ -25,7 +26,12 @@ class colorPalleteController extends Controller
     }
     public function get(Request $req)
     {
-        return colorPalette::findorfail($req->id);
+        try {
+            return colorPalette::findorfail($req->id);
+
+        } catch (Throwable $e) {
+            return response(null, 404);
+        }
     }
     public function edit(Request $req)
     {

@@ -8,6 +8,7 @@ use App\Models\landingPage;
 use App\Models\store;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Throwable;
 
 class StoreController extends Controller
 {
@@ -33,7 +34,12 @@ class StoreController extends Controller
     }
     public function edit(Request $req)
     {
-        $store = store::where('id', $req->id)->firstorfail();
+        try {
+            $store = store::where('id', $req->id)->firstorfail();
+
+        } catch (Throwable $e) {
+            return response(null, 404);
+        }
 
         $oldIcon = $store->id_logo;
         $oldDomain = $store->domain;

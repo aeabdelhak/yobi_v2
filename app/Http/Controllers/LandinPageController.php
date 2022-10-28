@@ -51,7 +51,12 @@ class LandinPageController extends Controller
 
     public function only(Request $req)
     {
-        $landing = landingPage::where('status', '!=', sharedStatus::$deleted)->where('id', $req->id)->firstorfail();
+        try {
+            $landing = landingPage::where('status', '!=', sharedStatus::$deleted)->where('id', $req->id)->firstorfail();
+
+        } catch (Throwable $e) {
+            return response(null, 404);
+        }
         $palletes = colorPalette::all();
         return compact('landing', 'palletes');
     }
@@ -95,8 +100,12 @@ class LandinPageController extends Controller
     public function client(Request $req)
     {
         $domain = $req->domain;
+        try {
+            $landing = landingPage::where('domain', strtolower($domain))->orwhere('id', $req->id)->with(['poster', 'pallete', 'cards'])->firstorfail();
 
-        $landing = landingPage::where('domain', strtolower($domain))->orwhere('id', $req->id)->with(['poster', 'pallete', 'cards'])->firstorfail();
+        } catch (Throwable $e) {
+            return response(null, 404);
+        }
         $store = store::find($landing->id_store);
         $store->token = null;
         $store->secret_token = null;
@@ -145,7 +154,12 @@ class LandinPageController extends Controller
     }
     public function edit(Request $req)
     {
-        $landingPage = landingPage::findorfail($req->id);
+        try {
+            $landingPage = landingPage::findorfail($req->id);
+
+        } catch (Throwable $e) {
+            return response(null, 404);
+        }
 
         $store = store::whereid($landingPage->id_store)->first();
         $fulldomain = strtolower(trim($req->domain . '.' . $store->domain));

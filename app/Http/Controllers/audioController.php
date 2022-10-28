@@ -6,6 +6,7 @@ use App\Enums\permissions;
 use App\Models\audio;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Throwable;
 
 class audioController extends Controller
 {
@@ -47,7 +48,13 @@ class audioController extends Controller
     }
     public function edit(Request $req)
     {
-        $audio = audio::findorfail($req->id);
+        try {
+
+            $audio = audio::findorfail($req->id);
+        } catch (Throwable $e) {
+            return response(null, 404);
+        }
+
         $audio->owner = $req->owner;
         if ($audio->save()) {
             return response()->json(['status' => 'Success', 'data' => $audio]);

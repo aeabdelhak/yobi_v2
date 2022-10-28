@@ -16,6 +16,7 @@ use App\Models\shape;
 use App\Models\shippServices;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Throwable;
 
 class orderController extends Controller
 {
@@ -161,8 +162,12 @@ class orderController extends Controller
 
     public function getOrder($id)
     {
+        try {
+            $order = Order::findorfail($id);
 
-        $order = Order::findorfail($id);
+        } catch (Throwable $e) {
+            return response(null, 404);
+        }
         $details = detail::leftjoin('shapes', 'shapes.id', 'details.id_shape')->leftjoin('landing_pages', 'shapes.id_landing_page', 'landing_pages.id')->leftjoin('sizes', 'sizes.id', 'details.id_size')->leftjoin('colors', 'colors.id', 'details.id_color')->leftjoin('offers', 'offers.id', 'details.id_offer')->where('id_order', $order->id)->get(DB::raw('shapes.name shape , offers.label offer ,sizes.label size ,colors.name color ,offers.id offerId ,colors.id colorId,price ,landing_pages.name'));
         foreach ($details as $key => $detail) {
 
