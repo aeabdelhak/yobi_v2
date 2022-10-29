@@ -60,7 +60,7 @@ class landingPage extends Model
 
     public static function hasManyShapes($id)
     {
-        $count = shape::Landing($id)->count();
+        $count = shape::Landing($id)->where('status', sharedStatus::$active)->count();
         if ($count > 1) {
             return true;
         }

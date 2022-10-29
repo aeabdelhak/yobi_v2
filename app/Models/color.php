@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\sharedStatus;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -32,7 +33,7 @@ class color extends Model
     }
     public static function hasManySizes($id)
     {
-        $count = size::ofColor($id)->count();
+        $count = size::ofColor($id)->where('status', sharedStatus::$active)->count();
         if ($count > 1) {
             return true;
         }

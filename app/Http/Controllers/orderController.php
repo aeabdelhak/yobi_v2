@@ -85,7 +85,6 @@ class orderController extends Controller
             if ($detail->offer) {
                 $name .= ' . العرض: ' . $detail->offer;
             }
-
             $names[] = $name;
         }
         return implode(',', $names);

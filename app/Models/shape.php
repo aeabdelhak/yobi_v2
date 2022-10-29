@@ -37,7 +37,7 @@ class shape extends Model
     }
     public static function hasManyColors($id)
     {
-        $count = color::ofShape($id)->count();
+        $count = color::ofShape($id)->where('status', sharedStatus::$active)->count();
         if ($count > 1) {
             return true;
         }
