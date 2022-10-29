@@ -73,7 +73,7 @@ class orderController extends Controller
         $details = detail::leftjoin('shapes', 'shapes.id', 'details.id_shape')->leftjoin('landing_pages', 'shapes.id_landing_page', 'landing_pages.id')->leftjoin('sizes', 'sizes.id', 'details.id_size')->leftjoin('colors', 'colors.id', 'details.id_color')->leftjoin('offers', 'offers.id', 'details.id_offer')->where('id_order', $id)->get(DB::raw('shapes.name shape , offers.label offer,colors.id color_id ,sizes.label size ,colors.name color ,shapes.id id_shape ,landing_pages.product_name ,landing_pages.id id_landing'));
 
         if (count($details) == 1) {
-            $detail = $details[1];
+            $detail = $details[0];
             $name = $detail->product_name;
             if ($detail->shape && landingPage::hasManyShapes($detail->id_landing)) {
                 $name .= ' . الشكل: ' . $detail->shape;
