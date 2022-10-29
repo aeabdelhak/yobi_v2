@@ -31,5 +31,17 @@ class shape extends Model
     {
         return $query->where('id_landing_page', $id)->where('status', '!=', sharedStatus::$deleted);
     }
+    public function scopeId($query, $id)
+    {
+        $query->where('id', $id);
+    }
+    public static function hasManyColors($id)
+    {
+        $count = color::ofShape($id)->count();
+        if ($count > 1) {
+            return true;
+        }
+        return false;
+    }
 
 }

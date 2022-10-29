@@ -25,5 +25,9 @@ class order extends Model
     {
         return $this->hasMany(detail::class, 'id_order');
     }
+    public function scopeId($query, $id)
+    {
+        $query->where('id', $id);
+    }
 
 }

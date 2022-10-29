@@ -52,4 +52,18 @@ class landingPage extends Model
     {
         return $query->where('id_store', $id);
     }
+
+    public function scopeId($query, $id)
+    {
+        $query->where('id', $id);
+    }
+
+    public static function hasManyShapes($id)
+    {
+        $count = shape::Landing($id)->count();
+        if ($count > 1) {
+            return true;
+        }
+        return false;
+    }
 }

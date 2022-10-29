@@ -30,5 +30,12 @@ class color extends Model
     {
         $query->where('id_shape', $id);
     }
-
+    public static function hasManySizes($id)
+    {
+        $count = size::ofColor($id)->count();
+        if ($count > 1) {
+            return true;
+        }
+        return false;
+    }
 }
