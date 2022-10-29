@@ -107,6 +107,7 @@ Route::controller(orderController::class)->group(function () {
     Route::post('order/status', 'changeStatus');
     Route::post('order/push', 'pushToDelivery');
     Route::get('order/history/{id}', 'history');
+    Route::get('order/name/{id}', 'getOrderName');
 });
 Route::controller(offerController::class)->group(function () {
     Route::post('offer', 'newOffer');

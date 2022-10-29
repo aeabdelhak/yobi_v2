@@ -22,4 +22,12 @@ class size extends Model
     {
         $query->where('id_color', $id)->where('status', '!=', sharedStatus::$deleted);
     }
+    public function scopeActive($query)
+    {
+        $query->where('status', sharedStatus::$active);
+    }
+    public function scopeId($query, $id)
+    {
+        $query->where('id', $id);
+    }
 }

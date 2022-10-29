@@ -14,6 +14,7 @@ use App\Models\order;
 use App\Models\orderChange;
 use App\Models\shape;
 use App\Models\shippServices;
+use App\Models\size;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Throwable;
@@ -23,7 +24,7 @@ class orderController extends Controller
     public function __construct()
     {
         $this->middleware('auth:api', ['except' => ['newOrder']]);
-        $this->middleware('permission:' . permissions::$orders, ['only' => ['getTotalPrice', 'getOrders', 'history', 'getOrderName', 'getStatistics', 'changeStatus']]);
+        $this->middleware('permission:' . permissions::$orders, ['only' => ['getTotalPrice', 'history', 'getOrders', 'getStatistics', 'getOrderName', 'changeStatus']]);
         $this->middleware('permission:' . permissions::$delivery, ['only' => ['pushToDelivery']]);
     }
 
@@ -120,16 +121,31 @@ class orderController extends Controller
         $order->id_landing_page = $req->id;
         if ($order->save()) {
 
-            $offer = offer::find($req->id_offer);
+            $shape = shape::id($req->id_shape)->active()->first();
+            if (!$shape) {
+                return res('fail', 'some parametres are missing');
+            }
+            if ($req->id_size) {
+                $sizeExist = size::id($req->id_size)->active()->first();
+                if (!$sizeExist) {
+                    return res('fail', 'size not found , or desactivated');
+                }
+            }
+
+            $colorExist = color::id($req->id_color)->active()->first();
+            if (!$colorExist) {
+                return res('fail', 'color is required');
+            }
+            $offer = hasOffer::joinOffer()->where('id_color', $req->id_color)->where('has_offers.status', sharedStatus::$active)->where('offers.status', sharedStatus::$active)->first();
+
             $offer_price = $offer ? ($offer->promotioned_price ?? $offer->original_price) : null;
-            $shape = shape::find($req->id);
             $shape_price = $shape ? $shape->promotioned_price ?? $shape->original_price : 0;
 
             $detail = new detail();
             $detail->id_color = $req->id_color;
             $detail->id_order = $order->id;
             $detail->id_shape = $req->id_shape;
-            $detail->id_offer = $req->id_offer;
+            $detail->id_offer = $offer ? $req->id_offer : null;
             $detail->id_size = $req->id_size;
             $detail->price = $offer_price ?? $shape_price;
             $detail->save();
@@ -189,7 +205,7 @@ class orderController extends Controller
         } catch (Throwable $e) {
             return response(null, 404);
         }
-        $details = detail::leftjoin('shapes', 'shapes.id', 'details.id_shape')->leftjoin('landing_pages', 'shapes.id_landing_page', 'landing_pages.id')->leftjoin('sizes', 'sizes.id', 'details.id_size')->leftjoin('colors', 'colors.id', 'details.id_color')->leftjoin('offers', 'offers.id', 'details.id_offer')->where('id_order', $order->id)->get(DB::raw('shapes.name shape , offers.label offer ,sizes.label size ,colors.name color ,offers.id offerId ,colors.id colorId,price ,landing_pages.name'));
+        $details = detail::leftjoin('shapes', 'shapes.id', 'details.id_shape')->leftjoin('landing_pages', 'shapes.id_landing_page', 'landing_pages.id')->leftjoin('sizes', 'sizes.id', 'details.id_size')->leftjoin('colors', 'colors.id', 'details.id_color')->leftjoin('offers', 'offers.id', 'details.id_offer')->where('id_order', $order->id)->get(DB::raw('shapes.name shape , offers.label offer ,sizes.label size ,colors.name color ,offers.id offerId ,colors.id colorId,price ,landing_pages.product_name name'));
         foreach ($details as $key => $detail) {
 
             if ($detail->offerId && $detail->colorId) {

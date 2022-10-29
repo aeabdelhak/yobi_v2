@@ -43,7 +43,7 @@ class colorsController extends Controller
                 $offer->path = FilesController::path($hasOffer->id_image);
                 $offer->id_color = $hasOffer->id;
                 $offer->status = $hasOffer->status;
-                $offer->idOffer = $offer->id;
+                $offer->idOffer = $hasOffer->id;
             }
 
         }

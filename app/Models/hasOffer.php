@@ -16,4 +16,13 @@ class hasOffer extends Model
         'id_offer',
     ];
 
+    public function scopeJoinOffer($query)
+    {
+        return $query->join('offers', 'offers.id', 'has_offers.id_offer');
+    }
+    public function scopeId($query, $id)
+    {
+        return $query->where('id', $id);
+    }
+
 }

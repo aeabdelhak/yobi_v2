@@ -39,4 +39,12 @@ class color extends Model
         }
         return false;
     }
+    public function scopeActive($query)
+    {
+        $query->where('status', sharedStatus::$active);
+    }
+    public function scopeId($query, $id)
+    {
+        $query->where('id', $id);
+    }
 }

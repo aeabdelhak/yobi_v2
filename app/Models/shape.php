@@ -19,6 +19,12 @@ class shape extends Model
         'id_landing_page',
 
     ];
+
+    public function scopeActive($query)
+    {
+        $query->where('status', sharedStatus::$active);
+    }
+
     public function colors()
     {
         return $this->hasMany(color::class, 'id_shape')->where('status', sharedStatus::$active);

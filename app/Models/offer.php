@@ -19,7 +19,14 @@ class offer extends Model
         'id_image',
 
     ];
-
+    public function scopeId($query, $id)
+    {
+        $query->where('id', $id);
+    }
+    public function scopeActive($query)
+    {
+        $query->where('status', sharedStatus::$active);
+    }
     public function scopeOflanding($query, $id)
     {
         $query->where('id_landing_page', $id)->where('status', '!=', sharedStatus::$deleted);

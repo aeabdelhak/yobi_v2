@@ -53,14 +53,14 @@ class offerController extends Controller
 
     public function setActive(Request $req)
     {
-        $hasOffer = hasOffer::find($req->id);
+        $hasOffer = hasOffer::id($req->id)->first();
         $hasOffer->status = sharedStatus::$active;
         $hasOffer->save();
         return res('success', 'activated', true);
     }
     public function setInActive(Request $req)
     {
-        $hasOffer = hasOffer::find($req->id);
+        $hasOffer = hasOffer::id($req->id)->first();
         $hasOffer->status = sharedStatus::$inActive;
         $hasOffer->save();
         return res('success', 'desactivaed', true);
