@@ -136,7 +136,11 @@ class StoreController extends Controller
     public function client(Request $request)
     {
         $domain = $request->header('domain');
-        $store = store::whereDomain($domain)->first();
+        if ($domain) {
+            $domain = str_replace('wwww.', '', $domain);
+            $store = store::whereDomain($domain)->first();
+
+        }
         return response()->json($store);
 
     }
