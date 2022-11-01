@@ -18,5 +18,7 @@ class orderStatus
     public static $outOfArea = 12;
     public static $collected = 13;
     public static $returned = 14;
+    public static $readyToDeliver = 15;
+    public static $receivedByDelivery = 16;
 
 }

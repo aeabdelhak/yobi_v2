@@ -22,6 +22,47 @@ class tawsilixController extends Controller
 
     public function checkStatus($id)
     {
+        $shipp = shippServices::where('id_shipping', $id)->first();
+
+        $res = $this->callapi('/track.php?code=' . $id, true);
+
+        $status = null;
+        if ($res["0"]['state'] == 'Livré') {
+            $status = orderStatus::$delivered;
+            $shipp->status = sharedStatus::$inActive;
+            $shipp->save();
+        }
+        if ($res["0"]['state'] == 'Reçu par livreur') {
+            $status = orderStatus::$receivedByDelivery;
+        }
+        if ($res["0"]['state'] == 'Expédié') {
+            $status = orderStatus::$shipping;
+        }
+        if ($res["0"]['state'] == 'Prèt pour expédition') {
+            $status = orderStatus::$readyToDeliver;
+        }
+        if ($res["0"]['state'] == 'Ramassé') {
+            $status = orderStatus::$collected;
+        }
+        if ($res["0"]['state'] == 'En attente de ramassage') {
+            $status = orderStatus::$pushedToDelivery;
+        }
+        if ($res["0"]['state'] == 'Retour client reçu') {
+            $status = orderStatus::$returned;
+            $shipp->status = sharedStatus::$inActive;
+            $shipp->save();
+        }
+        $order = order::id($shipp->id_order)->fiest();
+        if ($order->status !== $status) {
+            $order->status = $status;
+            $order->save();
+
+            $orderChange = new orderChange();
+            $orderChange->id_order = $order->id_order;
+            $orderChange->status = $status;
+            $orderChange->save();
+
+        }
 
     }
 
@@ -85,37 +126,7 @@ class tawsilixController extends Controller
     {
         $orders = shippServices::join('orders', 'orders.id', 'shipp_services.id_order')->where('shipp_services.status', sharedStatus::$active)->get(DB::raw('id_shipping,id_order,orders.status,shipp_services.id'));
         foreach ($orders as $key => $order) {
-            $res = $this->callapi('/track.php?code=' . $order->id_shipping, true);
-            $status = null;
-            if ($res["0"]['state'] == 'Livré') {
-                $status = orderStatus::$delivered;
-                shippServices::where('id', $order->id)->update([
-                    'status' => sharedStatus::$inActive,
-                ]);
-            }
-            if ($res["0"]['state'] == 'Prèt pour expédition') {
-                $status = orderStatus::$shipping;
-            }
-            if ($res["0"]['state'] == 'Retour client reçu') {
-                $status = orderStatus::$returned;
-                shippServices::where('id', $order->id)->update([
-                    'status' => sharedStatus::$inActive,
-                ]);
-            }
-            if ($res["0"]['state'] == 'Collecté par agence principale') {
-                $status = orderStatus::$collected;
-            }
-            if ($res["0"]['state'] == 'En attente de ramassage') {
-                $status = orderStatus::$pushedToDelivery;
-            }
-            if ($status != null && $status !== $order->status) {
-                order::where('id', $order->id_order)->update(['status' => $status]);
-                $orderChange = new orderChange();
-                $orderChange->id_order = $order->id_order;
-                $orderChange->status = $status;
-                $orderChange->save();
-            }
-
+            $this->checkStatus($order->id_shipping);
         }
 
     }

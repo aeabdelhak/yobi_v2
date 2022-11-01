@@ -124,6 +124,7 @@ Route::controller(vercelController::class)->group(function () {
 Route::controller(tawsilixController::class)->group(function () {
     Route::get('/tawsilix/cities', 'cities');
     Route::get('/tawsilix/update', 'updateOrderStatus');
+    Route::get('/tawsilix/check/{id}', 'checkStatus');
 });
 
 Route::controller(userResultsController::class)->group(function () {
