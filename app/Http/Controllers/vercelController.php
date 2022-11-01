@@ -66,10 +66,23 @@ class vercelController extends Controller
         return json_decode(curl($method, $path, $this::authorization(), $data));
 
     }
-    public function domainRemove($domain)
+    public function newStore($domain)
     {
 
-        $path = $this::$basUrl . "/v9/projects/landing-pages/domains/$domain";
+        $path = $this::$basUrl . "/v9/projects/store/domains";
+        $method = "POST";
+
+        $data = array(
+            "name" => $domain,
+        );
+
+        return json_decode(curl($method, $path, $this::authorization(), $data));
+
+    }
+    public function deleteStore($domain)
+    {
+
+        $path = $this::$basUrl . "/v9/projects/store/domains/$domain";
         $method = "DELETE";
 
         return json_decode(curl($method, $path, $this::authorization()));

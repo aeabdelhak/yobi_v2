@@ -17,6 +17,7 @@ class store extends Model
         'token',
         'secret_token',
         'id_logo',
+        'fecebook_meta_tag',
         'domain',
         'facebook',
         'tiktok',

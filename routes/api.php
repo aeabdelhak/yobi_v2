@@ -39,6 +39,7 @@ Route::controller(StoreController::class)->group(function () {
     Route::get('store/all', 'allStores');
     Route::delete('store/delete', 'delete');
     Route::post('store/edit', 'edit');
+    Route::get('store/client', 'client');
 
 });
 Route::controller(colorPalleteController::class)->group(function () {

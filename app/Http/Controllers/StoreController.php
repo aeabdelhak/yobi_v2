@@ -14,8 +14,8 @@ class StoreController extends Controller
 {
     public function __construct()
     {
-        $this->middleware('auth:api');
-        $this->middleware('permission:' . permissions::$store, ['except' => ['allStores']]);
+        $this->middleware('auth:api', ['except' => 'client']);
+        $this->middleware('permission:' . permissions::$store, ['except' => ['allStores', 'client']]);
 
     }
     public function get($id)
@@ -50,6 +50,7 @@ class StoreController extends Controller
         $store->description = $req->description;
         $store->token = $req->token;
         $store->secret_token = $req->secret_token;
+        $store->fecebook_meta_tag = $req->fecebook_meta_tag;
         $store->domain = strtolower(trim($req->domain));
         $store->facebook = $req->facebook;
         $store->tiktok = $req->tiktok;
@@ -100,6 +101,7 @@ class StoreController extends Controller
         $store->secret_token = $req->secret_token;
         $store->domain = $req->domain;
         $store->facebook = $req->facebook;
+        $store->fecebook_meta_tag = $req->fecebook_meta_tag;
         $store->tiktok = $req->tiktok;
         $store->google = $req->google;
         $store->id_logo = FilesController::store($req->file('logo'));
@@ -129,6 +131,13 @@ class StoreController extends Controller
         landingPage::ofStore($req->id)->update(['domain' => 'deleted', 'status' => sharedStatus::$deleted]);
         store::whereid($req->id)->update(['status' => sharedStatus::$deleted, 'domain' => 'deleted']);
         return res('success', 'store successfully deleted ', true);
+    }
+
+    public function client(Request $request)
+    {
+        $domain = $request->header('Host');
+
+        return $domain;
     }
 
 }
