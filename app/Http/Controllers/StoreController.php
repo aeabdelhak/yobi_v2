@@ -135,7 +135,7 @@ class StoreController extends Controller
 
     public function client(Request $request)
     {
-        $domain = $request->header('Host');
+        $domain = $request->header('domain');
 
         return response()->json(['domain' => $domain]);
     }
