@@ -39,6 +39,7 @@ class orderController extends Controller
         $order->address = $req->address;
         $order->city = $req->city;
         $order->phone = $req->phone;
+        $order->total_paid = $req->total_paid;
         $order->save();
         return res('success', 'order updated successfully', $order->fresh());
 
