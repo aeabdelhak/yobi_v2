@@ -18,7 +18,7 @@ class Kernel extends ConsoleKernel
     {
         $schedule->call(function () {
             (new tawsilixController())->updateOrderStatus();
-        })->everyTwoHours();
+        })->everyFifteenMinutes();
     }
 
     /**
