@@ -25,7 +25,7 @@ class tawsilixController extends Controller
 
         $shipp = shippServices::where('id_shipping', $id)->first();
         $res = $this->callapi('/track.php?code=' . $id, true);
-        $order = order::id($shipp->id_order)->fiest();
+        $order = order::id($shipp->id_order)->first();
         $status = $order->status;
 
         if ($res["0"]['state'] == 'Livré') {
