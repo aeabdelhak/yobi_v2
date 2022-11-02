@@ -58,7 +58,7 @@ class tawsilixController extends Controller
             $order->save();
 
             $orderChange = new orderChange();
-            $orderChange->id_order = $order->id_order;
+            $orderChange->id_order = $order->id;
             $orderChange->status = $status;
             $orderChange->save();
         }
