@@ -104,12 +104,12 @@ Route::controller(orderController::class)->group(function () {
     Route::post('order/submit', 'newOrder');
     Route::get('order/paginate', 'getOrders');
     Route::get('order/statistics', 'getStatistics');
-    Route::get('order/{id}', 'getOrder');
     Route::post('order/status', 'changeStatus');
     Route::post('order/push', 'pushToDelivery');
     Route::post('order/delete', 'delete');
     Route::get('order/history/{id}', 'history');
     Route::get('order/name/{id}', 'getOrderName');
+    Route::get('order/{id}', 'getOrder');
 });
 Route::controller(offerController::class)->group(function () {
     Route::post('offer', 'newOffer');
