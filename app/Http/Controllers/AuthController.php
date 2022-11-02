@@ -155,7 +155,7 @@ class AuthController extends Controller
     {
         return User::leftjoin('files', 'files.id', 'users.id_avatar')
             ->whereNotIn('status', [sharedStatus::$deleted, sharedStatus::$hidden])->
-            get(DB::raw('users.id,users.name,email,url avatar'));
+            get(DB::raw('users.id,users.name,email,url avatar,status'));
 
     }
     public function get($id)

@@ -12,7 +12,7 @@ class orderStatus
     public static $canceled = 6;
     public static $noResponce = 7;
     public static $callRequested = 8;
-    public static $callOv3 = 8;
+    public static $callOv3 = 9;
     public static $voiceMail = 10;
     public static $delayed = 11;
     public static $outOfArea = 12;
