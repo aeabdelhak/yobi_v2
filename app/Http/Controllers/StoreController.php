@@ -68,8 +68,8 @@ class StoreController extends Controller
 
             try {
                 if (env('APP_ENV') != 'local') {
-                    (new vercelController())->deleteStore('www' . $oldDomain);
-                    (new vercelController())->domainAdd('www' . $store->domain);
+                    (new vercelController())->deleteStore('www.' . $oldDomain);
+                    (new vercelController())->domainAdd('www.' . $store->domain);
                 }
 
             } catch (\Throwable$th) {
