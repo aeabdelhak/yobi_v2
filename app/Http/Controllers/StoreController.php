@@ -149,17 +149,16 @@ class StoreController extends Controller
             }
         }
         landingPage::ofStore($req->id)->update(['domain' => 'deleted', 'status' => sharedStatus::$deleted]);
-        $store = store::whereid($req->id)->first();
+        $store = store::where('id', $req->id)->first();
         $store->status == sharedStatus::$deleted;
-        try {if (env('APP_ENV') != 'local') {
-            (new vercelController())->deleteStore($req->domain);
-        }
-
-        } catch (Throwable $r) {
-
-        }
+        $domain = $store->domain;
         $store->domain == 'deleted';
         $store->save();
+        try {if (env('APP_ENV') != 'local') {
+            (new vercelController())->deleteStore($domain);
+        }
+        } catch (Throwable $r) {
+        }
         return res('success', 'store successfully deleted ', true);
     }
 
