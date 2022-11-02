@@ -150,9 +150,9 @@ class StoreController extends Controller
         }
         landingPage::ofStore($req->id)->update(['domain' => 'deleted', 'status' => sharedStatus::$deleted]);
         $store = store::where('id', $req->id)->first();
-        $store->status == sharedStatus::$deleted;
+        $store->status = sharedStatus::$deleted;
         $domain = $store->domain;
-        $store->domain == 'deleted';
+        $store->domain = 'deleted';
         $store->save();
         try {if (env('APP_ENV') != 'local') {
             (new vercelController())->deleteStore($domain);
