@@ -174,6 +174,8 @@ class orderController extends Controller
             [EnumsOrderStatus::$outOfArea => order::whereIn('id_landing_page', $landingsId)->where('status', EnumsOrderStatus::$outOfArea)->count()],
             [EnumsOrderStatus::$collected => order::whereIn('id_landing_page', $landingsId)->where('status', EnumsOrderStatus::$collected)->count()],
             [EnumsOrderStatus::$returned => order::whereIn('id_landing_page', $landingsId)->where('status', EnumsOrderStatus::$returned)->count()],
+            [EnumsOrderStatus::$readyToDeliver => order::whereIn('id_landing_page', $landingsId)->where('status', EnumsOrderStatus::$readyToDeliver)->count()],
+            [EnumsOrderStatus::$receivedByDelivery => order::whereIn('id_landing_page', $landingsId)->where('status', EnumsOrderStatus::$receivedByDelivery)->count()],
         ];
         return $statistcs;
 
