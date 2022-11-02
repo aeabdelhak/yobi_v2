@@ -22,11 +22,12 @@ class tawsilixController extends Controller
 
     public function checkStatus($id)
     {
+
         $shipp = shippServices::where('id_shipping', $id)->first();
-
         $res = $this->callapi('/track.php?code=' . $id, true);
+        $order = order::id($shipp->id_order)->fiest();
+        $status = $order->status;
 
-        $status = null;
         if ($res["0"]['state'] == 'Livré') {
             $status = orderStatus::$delivered;
             $shipp->status = sharedStatus::$inActive;
@@ -52,7 +53,6 @@ class tawsilixController extends Controller
             $shipp->status = sharedStatus::$inActive;
             $shipp->save();
         }
-        $order = order::id($shipp->id_order)->fiest();
         if ($order->status !== $status) {
             $order->status = $status;
             $order->save();
@@ -61,7 +61,6 @@ class tawsilixController extends Controller
             $orderChange->id_order = $order->id_order;
             $orderChange->status = $status;
             $orderChange->save();
-
         }
 
     }
