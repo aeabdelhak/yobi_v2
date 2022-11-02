@@ -6,6 +6,7 @@ use App\Http\Controllers\cardController;
 use App\Http\Controllers\colorPalleteController;
 use App\Http\Controllers\colorsController;
 use App\Http\Controllers\FilesController;
+use App\Http\Controllers\imagesController;
 use App\Http\Controllers\LandinPageController;
 use App\Http\Controllers\offerController;
 use App\Http\Controllers\orderController;
@@ -130,10 +131,15 @@ Route::controller(tawsilixController::class)->group(function () {
 
 Route::controller(userResultsController::class)->group(function () {
     Route::post('newResult', 'newResult');
-});
-Route::controller(userResultsController::class)->group(function () {
     Route::delete('newResult/{id}', 'delete');
+
 });
+Route::controller(imagesController::class)->group(function () {
+    Route::post('image', 'newImage');
+    Route::delete('image/{id}', 'delete');
+
+});
+
 Route::fallback(function () {
     return response()->json(null, 404);
 });

@@ -8,6 +8,7 @@ use App\Models\audio;
 use App\Models\card;
 use App\Models\colorPalette;
 use App\Models\file;
+use App\Models\image;
 use App\Models\landingPage;
 use App\Models\offer;
 use App\Models\shape;
@@ -37,6 +38,7 @@ class LandinPageController extends Controller
         $offers = offer::ofLanding($landing->id)->get();
         $audios = audio::leftjoin('files', 'files.id', 'id_file')->where('id_landing_page', $req->id)->get(DB::raw('owner,audio.id,url,path'));
         $results = userResult::join('files', 'files.id', 'user_results.id_image')->where('id_landing_page', $landing->id)->get(DB::raw('*,user_results.id as id'));
+        $images = image::join('files', 'files.id', 'images.id_image')->where('id_landing_page', $landing->id)->get(DB::raw('*,images.id as id'));
 
         return response()->json([
             'landing' => $landing,
@@ -45,6 +47,7 @@ class LandinPageController extends Controller
             'audios' => $audios,
             'results' => $results,
             'offers' => $offers,
+            'images' => $images,
         ]);
 
     }
@@ -129,6 +132,7 @@ class LandinPageController extends Controller
         }
 
         $landing->results = userResult::join('files', 'files.id', 'user_results.id_image')->where('id_landing_page', $landing->id)->get(DB::raw('*,user_results.id as id'));
+        $landing->images = image::join('files', 'files.id', 'images.id_image')->where('id_landing_page', $landing->id)->get(DB::raw('*,images.id as id'));
 
         $store->data = $landing;
 
