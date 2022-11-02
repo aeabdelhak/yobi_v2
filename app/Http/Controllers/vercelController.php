@@ -89,4 +89,17 @@ class vercelController extends Controller
 
     }
 
+    public function facebookVerificationRecord($domain, $txtValue)
+    {
+
+        $path = $this::$basUrl . "/v2/domains/$domain/records";
+        $method = "POST";
+
+        $data = array(
+            "type" => 'TXT',
+            "value" => $txtValue,
+        );
+        return json_decode(curl($method, $path, $this::authorization(), $data));
+    }
+
 }

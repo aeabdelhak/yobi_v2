@@ -107,6 +107,15 @@ class StoreController extends Controller
         $store->id_logo = FilesController::store($req->file('logo'));
         if ($store->save()) {
             $store = store::leftjoin('files', 'files.id', '=', 'id_logo')->where('stores.id', $store->id)->first(DB::raw("stores.id  ,url ,stores.name,stores.created_at,description "));
+            try {
+                if (env('APP_ENV') != 'local') {
+
+                    (new vercelController())->newStore($req->domain);
+                    (new vercelController())->facebookVerificationRecord($req->domain, $req->fecebook_meta_tag);
+                }
+            } catch (Throwable $r) {
+
+            };
 
             return [
                 'status' => "success",
@@ -124,12 +133,23 @@ class StoreController extends Controller
     {
         $donains = landingPage::ofStore($req->id)->pluck('domain');
         if (env('APP_ENV') != 'local') {
+
             foreach ($donains as $key => $value) {
                 (new vercelController())->domainRemove($value);
             }
         }
         landingPage::ofStore($req->id)->update(['domain' => 'deleted', 'status' => sharedStatus::$deleted]);
-        store::whereid($req->id)->update(['status' => sharedStatus::$deleted, 'domain' => 'deleted']);
+        $store = store::whereid($req->id)->first();
+        $store->status == sharedStatus::$deleted;
+        try {if (env('APP_ENV') != 'local') {
+            (new vercelController())->deleteStore($req->domain);
+        }
+
+        } catch (Throwable $r) {
+
+        }
+        $store->domain == 'deleted';
+        $store->save();
         return res('success', 'store successfully deleted ', true);
     }
 
