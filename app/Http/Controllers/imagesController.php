@@ -21,7 +21,7 @@ class imagesController extends Controller
         $result->id_landing_page = $req->id_landing_page;
         $result->id_image = FilesController::store($req->image);
         $result->save();
-        $result = image::join('files', 'files.id', 'user_results.id_image')->where('user_results.id', $result->id)->first(DB::raw('*,user_results.id as id'));
+        $result = image::join('files', 'files.id', 'images.id_image')->where('images.id', $result->id)->first(DB::raw('*,images.id as id'));
 
         return res('success', 'created successfully', $result);
     }
