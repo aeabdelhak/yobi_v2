@@ -123,7 +123,7 @@ class tawsilixController extends Controller
 
     public function updateOrderStatus()
     {
-        $orders = shippServices::join('orders', 'orders.id', 'shipp_services.id_order')->where('shipp_services.status', sharedStatus::$active)->get(DB::raw('id_shipping,id_order,orders.status,shipp_services.id'));
+        return $orders = shippServices::join('orders', 'orders.id', 'shipp_services.id_order')->where('shipp_services.status', sharedStatus::$active)->get(DB::raw('id_shipping,id_order,orders.status,shipp_services.id'));
         foreach ($orders as $key => $order) {
             $this->checkStatus($order->id_shipping);
         }
