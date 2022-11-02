@@ -65,6 +65,17 @@ class StoreController extends Controller
         $landings = landingPage::ofStore($store->id)->get();
 
         if ($oldDomain != $store->domain) {
+
+            try {
+                if (env('APP_ENV') != 'local') {
+                    (new vercelController())->deleteStore($oldDomain);
+                    (new vercelController())->domainAdd($store->domain);
+                }
+
+            } catch (\Throwable$th) {
+
+            }
+
             foreach ($landings as $key => $landing) {
                 $newDomain = explode('.', $landing->domain)[0] . '.' . $store->domain;
                 landingPage::where('id', $landing->id)->update([
@@ -109,7 +120,6 @@ class StoreController extends Controller
             $store = store::leftjoin('files', 'files.id', '=', 'id_logo')->where('stores.id', $store->id)->first(DB::raw("stores.id  ,url ,stores.name,stores.created_at,description "));
             try {
                 if (env('APP_ENV') != 'local') {
-
                     (new vercelController())->newStore($req->domain);
                     (new vercelController())->facebookVerificationRecord($req->domain, $req->fecebook_meta_tag);
                 }
