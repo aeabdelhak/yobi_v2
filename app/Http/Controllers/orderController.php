@@ -17,7 +17,6 @@ use App\Models\shippServices;
 use App\Models\size;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Throwable;
 
 class orderController extends Controller
 {
@@ -195,18 +194,17 @@ class orderController extends Controller
             if ($req->status) {
                 return $query->whereIn('status', explode(',', $req->status));
             }
-        })->orderby('created_at', 'desc')->paginate(20);
+        })->NotDeleted()->orderby('created_at', 'desc')->paginate(20);
 
     }
 
     public function getOrder($id)
     {
-        try {
-            $order = Order::findorfail($id);
-
-        } catch (Throwable $e) {
+        $order = Order::id($id)->NotDeleted()->first();
+        if (!$order) {
             return response(null, 404);
         }
+
         $details = detail::leftjoin('shapes', 'shapes.id', 'details.id_shape')->leftjoin('landing_pages', 'shapes.id_landing_page', 'landing_pages.id')->leftjoin('sizes', 'sizes.id', 'details.id_size')->leftjoin('colors', 'colors.id', 'details.id_color')->leftjoin('offers', 'offers.id', 'details.id_offer')->where('id_order', $order->id)->get(DB::raw('shapes.name shape , offers.label offer ,sizes.label size ,colors.name color ,offers.id offerId ,colors.id colorId,price ,landing_pages.product_name name'));
         foreach ($details as $key => $detail) {
 
@@ -297,6 +295,13 @@ class orderController extends Controller
     public function history($id)
     {
         return orderChange::leftjoin('users', 'users.id', 'order_changes.id_user')->leftjoin('files', 'users.id_avatar', 'files.id')->orderby('order_changes.created_at', 'desc')->oforder($id)->get(DB::raw('order_changes.status,note,users.name,email,order_changes.created_at date ,to_date ,url avatar'));
+
+    }
+
+    public function delete(Request $request)
+    {
+        order::wherein('id', $request->ids)->update(['status' => EnumsOrderStatus::$deleted]);
+        return res('success', 'orders successfully deleted ', true);
 
     }
 

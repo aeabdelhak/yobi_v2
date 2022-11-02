@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\orderStatus;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -28,6 +29,10 @@ class order extends Model
     public function scopeId($query, $id)
     {
         $query->where('id', $id);
+    }
+    public function scopeNotDeleted($query)
+    {
+        $query->where('status', '!=', orderStatus::$deleted);
     }
 
 }

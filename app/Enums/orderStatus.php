@@ -20,5 +20,6 @@ class orderStatus
     public static $returned = 14;
     public static $readyToDeliver = 15;
     public static $receivedByDelivery = 16;
+    public static $deleted = 88;
 
 }
