@@ -66,7 +66,7 @@ class tawsilixController extends Controller
             $orderChange->save();
         }
         $diff = time() - $time;
-        echo "-ends within: $diff  \n";
+        echo "-ended within: $diff  \n";
 
     }
 
