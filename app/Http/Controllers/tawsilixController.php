@@ -23,7 +23,8 @@ class tawsilixController extends Controller
     public function checkStatus($id)
     {
         echo "-$id :checking \n";
-        echo now() . "\n";
+        $time = now();
+
         $shipp = shippServices::where('id_shipping', $id)->first();
 
         $res = $this->callapi('/track.php?code=' . $id, true);
@@ -64,9 +65,8 @@ class tawsilixController extends Controller
             $orderChange->status = $status;
             $orderChange->save();
         }
-        echo now() . "\n";
-
-        echo "-$id : done   \n";
+        $diff = now() - $time;
+        echo "-$id : done  , duration: $diff  \n";
 
     }
 
