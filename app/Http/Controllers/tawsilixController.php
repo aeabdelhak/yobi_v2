@@ -22,7 +22,7 @@ class tawsilixController extends Controller
 
     public function checkStatus($id)
     {
-        echo "-$id :checking \n";
+        echo "-check for $id \n";
         $time = time();
 
         $shipp = shippServices::where('id_shipping', $id)->first();
@@ -66,7 +66,7 @@ class tawsilixController extends Controller
             $orderChange->save();
         }
         $diff = time() - $time;
-        echo "-$id : done  , duration: $diff  \n";
+        echo "-ends within: $diff  \n";
 
     }
 
