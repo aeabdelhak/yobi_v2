@@ -2,7 +2,6 @@
 
 namespace App\Console;
 
-use App\Http\Controllers\tawsilixController;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 
@@ -16,9 +15,9 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
-        $schedule->call(function () {
-            return (new tawsilixController())->updateOrderStatus();
-        })->everyFiveMinutes();
+/*         $schedule->call(function () {
+return (new tawsilixController())->updateOrderStatus();
+})->everyFiveMinutes(); */
     }
 
     /**
