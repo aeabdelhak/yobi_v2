@@ -24,6 +24,8 @@ class tawsilixController extends Controller
     {
 
         $shipp = shippServices::where('id_shipping', $id)->first();
+
+        echo "- $id :checking \n";
         $res = $this->callapi('/track.php?code=' . $id, true);
         $order = order::id($shipp->id_order)->first();
         $status = $order->status;
@@ -62,6 +64,7 @@ class tawsilixController extends Controller
             $orderChange->status = $status;
             $orderChange->save();
         }
+        echo "-$id : done   \n";
 
     }
 
@@ -123,10 +126,12 @@ class tawsilixController extends Controller
 
     public function updateOrderStatus()
     {
+        echo '----------- start checking -----------  \n';
         $orders = shippServices::join('orders', 'orders.id', 'shipp_services.id_order')->where('shipp_services.status', sharedStatus::$active)->get(DB::raw('id_shipping,id_order,orders.status,shipp_services.id'));
         foreach ($orders as $key => $order) {
             $this->checkStatus($order->id_shipping);
         }
+        echo '----------- end checking ----------- \n';
 
     }
 

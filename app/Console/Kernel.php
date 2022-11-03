@@ -17,7 +17,7 @@ class Kernel extends ConsoleKernel
     protected function schedule(Schedule $schedule)
     {
         $schedule->call(function () {
-            (new tawsilixController())->updateOrderStatus();
+            return (new tawsilixController())->updateOrderStatus();
         })->everyFiveMinutes();
     }
 
