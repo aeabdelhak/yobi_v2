@@ -126,7 +126,7 @@ class StoreController extends Controller
         $access = $user->StoreAccess()->toArray();
         if ($user->status == userStatus::$superAdmin || in_array($store->id, $access)) {
             $cookie = cookie(constants::$storeCookieName, $store->id, 60 * 24, '/');
-            return response(["store" => $store, "status" => "success"], 200)->cookie($cookie, null, null, null, false, false, false, null);
+            return response(["store" => $store, "status" => "success"], 200)->cookie($cookie, null, null, null, false, false, false, 'None');
         }
         return response(["status" => 'fail', "message" => "you are not authorized"], 200)->withoutCookie(constants::$storeCookieName);
     }
