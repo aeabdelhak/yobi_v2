@@ -128,7 +128,7 @@ class StoreController extends Controller
 
             $cookie = cookie(constants::$storeCookieName, $store->id, 60 * 24, '/', null, true, true, false, 'None');
 
-            return response(["store" => $store, "status" => "success"], 200)->withCookie(cookie($cookie));
+            return response(["store" => $store, "status" => "success"], 200)->withCookie($cookie);
         }
         return response(["status" => 'fail', "message" => "you are not authorized"], 200)->withoutCookie(constants::$storeCookieName);
     }
