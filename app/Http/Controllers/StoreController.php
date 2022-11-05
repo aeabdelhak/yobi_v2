@@ -2,12 +2,15 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\constants;
 use App\Enums\permissions;
 use App\Enums\sharedStatus;
+use App\Enums\userStatus;
 use App\Models\landingPage;
 use App\Models\store;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use PHPOpenSourceSaver\JWTAuth\Facades\JWTAuth;
 use Throwable;
 
 class StoreController extends Controller
@@ -15,7 +18,7 @@ class StoreController extends Controller
     public function __construct()
     {
         $this->middleware('auth:api', ['except' => 'client']);
-        $this->middleware('permission:' . permissions::$store, ['except' => ['allStores', 'client']]);
+        $this->middleware('permission:' . permissions::$store, ['except' => ['allStores', 'client', 'select']]);
 
     }
     public function get($id)
@@ -23,7 +26,16 @@ class StoreController extends Controller
         return store::where('stores.id', $id)
             ->where('status', '!=', sharedStatus::$deleted)
             ->join('files', 'files.id', '=', 'id_logo')
-            ->get(DB::raw("stores.id  ,url ,stores.name,stores.created_at,description "))[0];
+            ->first(DB::raw("stores.id  ,url ,stores.name,stores.created_at,description,domain "));
+    }
+
+    public function current(Request $req)
+    {
+        $id = $req->cookie(constants::$storeCookieName);
+        if ($id) {
+            return response($this->get($id));
+        }
+
     }
     public function only(Request $req)
     {
@@ -32,6 +44,7 @@ class StoreController extends Controller
             ->where('status', '!=', sharedStatus::$deleted)
             ->with(['icon'])->first();
     }
+
     public function edit(Request $req)
     {
         try {
@@ -95,13 +108,45 @@ class StoreController extends Controller
 
         return res('success', 'updated suuccessfuly', true);
     }
-    public function allStores()
+
+    public function select(Request $req)
     {
 
-        return store::leftjoin('files', 'files.id', '=', 'id_logo')
+        $id = $req->id;
+
+        $store = store::leftjoin('files', 'files.id', '=', 'id_logo')
             ->where('status', '!=', sharedStatus::$deleted)
-            ->get(DB::raw("stores.id  ,url ,stores.name,stores.created_at,description,domain "));
+            ->where('stores.id', $id)
+            ->first(DB::raw("stores.id  ,url ,stores.name,stores.created_at,description,domain "));
+
+        if (!$store) {
+            return response($store, 404)->withoutCookie(constants::$storeCookieName);
+        }
+        $user = JWTAuth::user();
+        $access = $user->StoreAccess()->toArray();
+        if ($user->status == userStatus::$superAdmin || in_array($store->id, $access)) {
+            $cookie = cookie(constants::$storeCookieName, $store->id, 60 * 24, '/');
+            return response(["store" => $store, "status" => "success"], 200)->cookie($cookie, null, null, null, false, false);
+        }
+        return response(["status" => 'fail', "message" => "you are not authorized"], 200)->withoutCookie(constants::$storeCookieName);
     }
+
+    public function allStores()
+    {
+        $user = JWTAuth::user();
+        if ($user->status == userStatus::$superAdmin) {
+            return store::leftjoin('files', 'files.id', '=', 'id_logo')
+                ->where('status', '!=', sharedStatus::$deleted)
+                ->get(DB::raw("stores.id  ,url ,stores.name,stores.created_at,description,domain "));
+        }
+        return store::leftjoin('files', 'files.id', '=', 'id_logo')
+            ->join('store_accesses', 'store_accesses.id_store', 'stores.id')
+            ->where('status', '!=', sharedStatus::$deleted)
+            ->where('id_user', '!=', $user->id)
+            ->get(DB::raw("stores.id  ,url ,stores.name,stores.created_at,description,domain "));
+
+    }
+
     public function newStore(Request $req)
     {
 

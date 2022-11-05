@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\constants;
 use App\Enums\permissions;
 use App\Enums\sharedStatus;
+use App\Enums\userStatus;
 use App\Models\hasPermission;
 use App\Models\permission;
 use App\Models\User;
@@ -20,16 +22,12 @@ class AuthController extends Controller
     public function __construct()
     {
         $this->middleware('auth:api', ['except' => ['login']]);
-        $this->middleware('permission:' . permissions::$staff, ['except' => ['avatarUpload', 'editName', 'editpassword', 'login']]);
+        $this->middleware('permission:' . permissions::$staff, ['except' => ['avatarUpload', 'editName', 'editpassword', 'user', 'login']]);
     }
 
     public function login(Request $request)
     {
 
-        $request->validate([
-            'email' => 'required|string|email',
-            'password' => 'required|string',
-        ]);
         $credentials = $request->only('email', 'password');
 
         $token = Auth::attempt($credentials);
@@ -42,10 +40,10 @@ class AuthController extends Controller
 
         $user = Auth::user();
 
-        if ($user->status == sharedStatus::$inActive) {
+        if ($user->status == userStatus::$inActive) {
             return res('fail', 'this account is desactivated');
         }
-        if ($user->status == sharedStatus::$deleted) {
+        if ($user->status == userStatus::$deleted) {
             return res('fail', 'invalid credentials');
         }
 
@@ -58,7 +56,7 @@ class AuthController extends Controller
                 'token' => $token,
                 'type' => 'bearer',
             ],
-        ])->withCookie(cookie('authToken', $token, 99999, '/', true, true));
+        ])->withCookie(cookie(constants::$refreshToken, $token, 99999, null, null, true, true));
 
     }
 
@@ -139,13 +137,14 @@ class AuthController extends Controller
         return response()->json([
             'status' => 'success',
             'message' => 'Successfully logged out',
-        ]);
+        ])->withoutCookie(constants::$refreshToken);
     }
 
     public function user()
     {
         $user = Auth::user();
         $user->avatar = FilesController::url($user->id_avatar);
+        $user->permissions = Auth::user()->Permissions();
         return response()->json([
             'status' => 'success',
             'user' => $user,
@@ -173,7 +172,8 @@ class AuthController extends Controller
 
     public function refresh()
     {
-        return response()->json(Auth::refresh());
+        $token = Auth::refresh();
+        return response()->json($token)->withCookie(constants::$refreshToken, $token, null, null, null, true, true);
     }
     public function avatarUpload(Request $req)
     {

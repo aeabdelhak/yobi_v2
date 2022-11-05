@@ -13,6 +13,7 @@ class audioController extends Controller
 
     public function __construct()
     {
+
         $this->middleware('auth:api');
         $this->middleware('permission:' . permissions::$landing, ['only' => ['newAudio', 'edit', 'delete']]);
 

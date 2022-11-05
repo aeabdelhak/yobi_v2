@@ -2,7 +2,7 @@
 
 namespace App\Http\Middleware;
 
-use App\Enums\sharedStatus;
+use App\Enums\userStatus;
 use Closure;
 use Exception;
 use PHPOpenSourceSaver\JWTAuth\Facades\JWTAuth;
@@ -21,7 +21,7 @@ class Authenticate extends BaseMiddleware
     {
         try {
             $user = JWTAuth::parseToken()->authenticate();
-            if ($user && in_array($user->status, [sharedStatus::$active, sharedStatus::$hidden])) {
+            if ($user && in_array($user->status, [userStatus::$active, userStatus::$superAdmin])) {
                 return $next($request);
             } else {
                 return response()->json(['status' => 'invalid token'], 403);
@@ -29,7 +29,7 @@ class Authenticate extends BaseMiddleware
 
         } catch (Exception $e) {
             return response()->json(['status' => 'invalid'], 403);
-
         }
+
     }
 }

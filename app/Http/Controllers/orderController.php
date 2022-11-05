@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\constants;
 use App\Enums\orderStatus as EnumsOrderStatus;
 use App\Enums\permissions;
 use App\Enums\sharedStatus;
@@ -25,6 +26,7 @@ class orderController extends Controller
         $this->middleware('auth:api', ['except' => ['newOrder']]);
         $this->middleware('permission:' . permissions::$orders, ['only' => ['getTotalPrice', 'history', 'getOrders', 'getStatistics', 'getOrderName', 'changeStatus']]);
         $this->middleware('permission:' . permissions::$delivery, ['only' => ['pushToDelivery']]);
+        $this->middleware('storeAccess', ['except' => ['newOrder']]);
     }
 
     public function edit(Request $req)
@@ -177,14 +179,15 @@ class orderController extends Controller
             [EnumsOrderStatus::$readyToDeliver => order::whereIn('id_landing_page', $landingsId)->where('status', EnumsOrderStatus::$readyToDeliver)->count()],
             [EnumsOrderStatus::$receivedByDelivery => order::whereIn('id_landing_page', $landingsId)->where('status', EnumsOrderStatus::$receivedByDelivery)->count()],
         ];
-        return $statistcs;
+        return response($statistcs);
 
     }
 
     public function getOrders(Request $req)
     {
+        $store = $req->cookie(constants::$storeCookieName);
 
-        $landingsId = landingPage::ofStore($req->storeId)->pluck('id');
+        $landingsId = landingPage::ofStore($store)->pluck('id');
 
         return order::whereIn('id_landing_page', $landingsId)->where(function ($query) use ($req) {
             if ($req->search) {
@@ -289,6 +292,7 @@ class orderController extends Controller
             $orderChange->save();
 
             return res('success', 'pushed to tawsilix successfully', $order->fresh());
+
         }
         return res('fail', 'something went wrong');
 
@@ -303,7 +307,6 @@ class orderController extends Controller
     {
         order::wherein('id', $request->ids)->update(['status' => EnumsOrderStatus::$deleted]);
         return res('success', 'orders successfully deleted ', true);
-
     }
 
 }

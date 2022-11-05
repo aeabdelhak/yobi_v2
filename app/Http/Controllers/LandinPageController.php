@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\constants;
 use App\Enums\permissions;
 use App\Enums\sharedStatus;
 use App\Models\audio;
@@ -66,14 +67,14 @@ class LandinPageController extends Controller
 
     public function all(Request $req)
     {
-        return landingPage::where('status', '!=', sharedStatus::$deleted)->where('id_store', $req->id)->get();
-
+        $landings = landingPage::where('status', '!=', sharedStatus::$deleted)->where('id_store', $req->id)->get();
+        return response($landings);
     }
 
     public function newLanding(Request $req)
     {
-
-        $store = store::findorfail($req->id_store);
+        $id = $req->cookie(constants::$storeCookieName);
+        $store = store::findorfail($id);
         $fulldomain = strtolower(trim($req->domain . '.' . $store->domain));
 
         if (landingPage::whereDomain($fulldomain)->first()) {
@@ -86,7 +87,7 @@ class LandinPageController extends Controller
         $landingPage->domain = $fulldomain;
         $landingPage->product_description = $req->product_description;
         $landingPage->product_name = $req->product_name;
-        $landingPage->id_store = $req->id_store;
+        $landingPage->id_store = $id;
         $landingPage->id_poster = FilesController::store($req->poster);
         $landingPage->id_pallete = $req->id_pallete;
         if ($landingPage->save()) {

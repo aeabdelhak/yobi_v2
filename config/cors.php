@@ -1,5 +1,17 @@
 <?php
 
+use Illuminate\Http\Request;
+$request = new Request();
+
+$origin = '';
+
+foreach (getallheaders() as $name => $value) {
+    if (strtolower($name) == 'origin') {
+        $origin = $value;
+        break;
+    }
+}
+
 return [
 
     /*
@@ -15,11 +27,11 @@ return [
     |
      */
 
-    'paths' => ['api/*', 'sanctum/csrf-cookie', 'storage/*'],
+    'paths' => ['api/*', 'sanctum/csrf-cookie', 'storage/*', 'api'],
 
     'allowed_methods' => ['*'],
 
-    'allowed_origins' => ['*'],
+    'allowed_origins' => [$origin],
 
     'allowed_origins_patterns' => [],
 
@@ -27,8 +39,8 @@ return [
 
     'exposed_headers' => [],
 
-    'max_age' => 0,
+    'max_age' => 2123123,
 
-    'supports_credentials' => false,
+    'supports_credentials' => true,
 
 ];

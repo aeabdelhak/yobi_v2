@@ -21,7 +21,9 @@ class permissionController extends Controller
         $code = $req->code;
         $permission = permission::where('code', $code)->first();
         if (!$permission) {
+
             return null;
+
         }
 
         hasPermission::firstOrCreate(['id_permission' => $permission->id, 'id_user' => $id]);
