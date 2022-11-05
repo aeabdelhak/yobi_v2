@@ -56,7 +56,7 @@ class AuthController extends Controller
                 'token' => $token,
                 'type' => 'bearer',
             ],
-        ])->withCookie(cookie(constants::$refreshToken, $token, 99999, null, null, true, true));
+        ])->withCookie(cookie(constants::$refreshToken, $token, 99999, null, null, true, true, false, null));
 
     }
 
@@ -173,7 +173,7 @@ class AuthController extends Controller
     public function refresh()
     {
         $token = Auth::refresh();
-        return response()->json($token)->withCookie(constants::$refreshToken, $token, null, null, null, true, true);
+        return response()->json($token)->withCookie(constants::$refreshToken, $token, null, null, null, true, true, false, null);
     }
     public function avatarUpload(Request $req)
     {
