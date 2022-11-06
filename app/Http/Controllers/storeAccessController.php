@@ -27,7 +27,6 @@ class storeAccessController extends Controller
     {
         $id = $req->id_user;
         $store = $req->cookie(constants::$storeCookieName);
-
         storeAccess::where('id_user', $id)->where('id_store', $store)->delete();
         return res('success', 'successfuly desactivatd');
 

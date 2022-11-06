@@ -19,11 +19,11 @@ class EnsureStoreAccess
     public function handle(Request $request, Closure $next)
     {
         $store = $request->cookie(constants::$storeCookieName);
-
-        if (Auth::user()->hasAccess($store)) {
+        $access = Auth::user()->hasAccess($store);
+        if ($access) {
             return $next($request);
         }
-        return response('you have no acceess to this store', 401);
+        return response(null, 401);
 
     }
 }

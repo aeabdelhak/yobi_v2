@@ -21,7 +21,7 @@ class EnsurePermission
         if (in_array($code, $permissions)) {
             return $next($request);
         }
-        return response('you have no acceess to this store', 401);
+        return response('you cant aceess this resource', 401);
 
     }
 }

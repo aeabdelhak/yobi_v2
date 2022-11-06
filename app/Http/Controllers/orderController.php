@@ -18,6 +18,7 @@ use App\Models\shippServices;
 use App\Models\size;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use PHPOpenSourceSaver\JWTAuth\Facades\JWTAuth;
 
 class orderController extends Controller
 {
@@ -26,7 +27,7 @@ class orderController extends Controller
         $this->middleware('auth:api', ['except' => ['newOrder']]);
         $this->middleware('permission:' . permissions::$orders, ['only' => ['getTotalPrice', 'history', 'getOrders', 'getStatistics', 'getOrderName', 'changeStatus']]);
         $this->middleware('permission:' . permissions::$delivery, ['only' => ['pushToDelivery']]);
-        $this->middleware('storeAccess', ['except' => ['newOrder']]);
+        $this->middleware('storeAccess', ['except' => ['newOrder', 'getOrder']]);
     }
 
     public function edit(Request $req)
@@ -202,11 +203,16 @@ class orderController extends Controller
 
     }
 
-    public function getOrder($id)
+    public function getOrder(Request $req, $id)
     {
+        $storeId = $req->cookie(constants::$refreshToken);
+
         $order = Order::id($id)->NotDeleted()->first();
-        if (!$order) {
-            return response(null, 404);
+
+        $orderStoreId = $order->store();
+
+        if (!$storeId || !$order || $storeId != $orderStoreId || !JWTAuth::user()->hasAccess($orderStoreId)) {
+            return response(['notFound' => true], );
         }
 
         $details = detail::leftjoin('shapes', 'shapes.id', 'details.id_shape')->leftjoin('landing_pages', 'shapes.id_landing_page', 'landing_pages.id')->leftjoin('sizes', 'sizes.id', 'details.id_size')->leftjoin('colors', 'colors.id', 'details.id_color')->leftjoin('offers', 'offers.id', 'details.id_offer')->where('id_order', $order->id)->get(DB::raw('shapes.name shape , offers.label offer ,sizes.label size ,colors.name color ,offers.id offerId ,colors.id colorId,price ,landing_pages.product_name name'));
@@ -219,7 +225,7 @@ class orderController extends Controller
             }
 
         }
-        return compact('order', 'details');
+        return response(compact('order', 'details'), 200);
 
     }
 

@@ -18,7 +18,8 @@ class StoreController extends Controller
     public function __construct()
     {
         $this->middleware('auth:api', ['except' => 'client']);
-        $this->middleware('permission:' . permissions::$store, ['except' => ['allStores', 'client', 'select']]);
+        $this->middleware('permission:' . permissions::$store, ['only' => ['edit', 'delete', 'newStore']]);
+        $this->middleware('storeAccess', ['except' => ['newOrder']]);
 
     }
     public function get($id)
@@ -128,8 +129,8 @@ class StoreController extends Controller
             return response($store, 404)->withoutCookie(constants::$storeCookieName);
         }
         $user = JWTAuth::user();
-        $access = $user->StoreAccess()->toArray();
-        if ($user->status == userStatus::$superAdmin || in_array($store->id, $access)) {
+        $access = $user->hasAccess($id);
+        if ($user->status == userStatus::$superAdmin || $access) {
 
             $cookie = cookie(constants::$storeCookieName, $store->id, 60 * 24, '/', null, true, true, false, 'None');
 
@@ -149,7 +150,7 @@ class StoreController extends Controller
         return store::leftjoin('files', 'files.id', '=', 'id_logo')
             ->join('store_accesses', 'store_accesses.id_store', 'stores.id')
             ->where('status', '!=', sharedStatus::$deleted)
-            ->where('id_user', '!=', $user->id)
+            ->where('id_user', $user->id)
             ->get(DB::raw("stores.id  ,url ,stores.name,stores.created_at,description,domain "));
 
     }

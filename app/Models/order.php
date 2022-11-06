@@ -34,5 +34,11 @@ class order extends Model
     {
         $query->where('status', '!=', orderStatus::$deleted);
     }
+    public function store()
+    {
+        $landing = landingPage::whereId($this->id_landing_page)->first();
+        $store = store::whereId($landing->id_store)->value('id');
+        return $store;
+    }
 
 }
