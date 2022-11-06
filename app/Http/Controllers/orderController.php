@@ -205,8 +205,7 @@ class orderController extends Controller
 
     public function getOrder(Request $req, $id)
     {
-        $storeId = $req->cookie(constants::$refreshToken);
-
+        $storeId = $req->cookie(constants::$storeCookieName);
         $order = Order::id($id)->NotDeleted()->first();
 
         $orderStoreId = $order->store();
