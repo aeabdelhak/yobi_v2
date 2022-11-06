@@ -235,6 +235,18 @@ class AuthController extends Controller
 
         user::where('id', $req->id)->update(['status' => $status]);
         return res('success', 'status changed successfuly', true);
+    }
+
+    public function ungrantUsersSearch(Request $req)
+    {
+        $id = $req->cookie(constants::$storeCookieName);
+        $search = $req->s;
+        return user::leftjoin('store_accesses', 'store_accesses.id_user', 'users.id')->leftjoin('files', 'files.id', 'id_avatar')->where(function ($query) use ($id) {
+            return $query->where('id_store', '!=', $id)->orwhereNull('id_store');
+        })->whereNotIn('status', [userStatus::$deleted, userStatus::$superAdmin])->where(function ($query) use ($search) {
+            return $query->where('users.name', 'like', '%' . $search . '%')->orwhere('email', 'like', '%' . $search . '%');
+
+        })->get(DB::raw('users.id id, url ,users.name name, email'));
 
     }
 

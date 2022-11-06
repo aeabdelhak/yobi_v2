@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\orderStatus;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -27,6 +28,10 @@ class store extends Model
     public function icon()
     {
         return $this->hasOne(file::class, 'id', 'id_logo');
+    }
+    public function users()
+    {
+        return $this->hasManyThrough(User::class, storeAccess::class, 'id_store', 'id', 'id', 'id_user')->where('users.status', '!=', orderStatus::$deleted);
     }
 
 }

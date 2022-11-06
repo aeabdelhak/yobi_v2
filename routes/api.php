@@ -13,6 +13,7 @@ use App\Http\Controllers\orderController;
 use App\Http\Controllers\permissionController;
 use App\Http\Controllers\shapesController;
 use App\Http\Controllers\sizesController;
+use App\Http\Controllers\storeAccessController;
 use App\Http\Controllers\StoreController;
 use App\Http\Controllers\tawsilixController;
 use App\Http\Controllers\userResultsController;
@@ -25,13 +26,14 @@ Route::middleware('refToken')->group(function () {
         Route::post('register', 'register');
         Route::post('logout', 'logout');
         Route::get('user', 'user');
+        Route::get('user/ungrantedSearch', 'ungrantUsersSearch');
         Route::post('refresh', 'refresh');
         Route::get('user/all', 'all');
-        Route::get('user/{id}', 'get');
         Route::post('user/avatar', 'avatarUpload');
         Route::put('user/name', 'editName');
         Route::put('user/password', 'editpassword');
         Route::put('user/status', 'changeStatus');
+        Route::get('user/{id}', 'get');
         Route::delete('user/{id}', 'delete');
 
     });
@@ -140,6 +142,11 @@ Route::middleware('refToken')->group(function () {
     Route::controller(imagesController::class)->group(function () {
         Route::post('image', 'newImage');
         Route::delete('image/{id}', 'delete');
+
+    });
+    Route::controller(storeAccessController::class)->group(function () {
+        Route::post('store/access/grant', 'grant');
+        Route::delete('store/access/disgrant', 'delete');
 
     });
 });

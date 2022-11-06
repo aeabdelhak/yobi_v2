@@ -39,10 +39,15 @@ class StoreController extends Controller
     }
     public function only(Request $req)
     {
+        if ($req->fromCookie) {
+            $id = $req->cookie(constants::$storeCookieName);
+        } else {
+            $id = $req->id;
+        }
 
-        return store::where('stores.id', $req->id)
+        return store::where('stores.id', $id)
             ->where('status', '!=', sharedStatus::$deleted)
-            ->with(['icon'])->first();
+            ->with(['icon', 'users'])->first();
     }
 
     public function edit(Request $req)
