@@ -25,8 +25,7 @@ class orderController extends Controller
     public function __construct()
     {
         $this->middleware('auth:api', ['except' => ['newOrder']]);
-        $this->middleware('permission:' . permissions::$orders, ['only' => ['getTotalPrice', 'history', 'getOrders', 'getStatistics', 'getOrderName', 'changeStatus']]);
-        $this->middleware('permission:' . permissions::$delivery, ['only' => ['pushToDelivery']]);
+        $this->middleware('permission:' . permissions::$orders, ['only' => ['getTotalPrice', 'history', 'getOrders', 'getStatistics', 'getOrderName', 'changeStatus', 'pushToDelivery']]);
         $this->middleware('storeAccess', ['except' => ['newOrder', 'getOrder']]);
     }
 

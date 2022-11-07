@@ -19,7 +19,7 @@ class StoreController extends Controller
     {
         $this->middleware('auth:api', ['except' => 'client']);
         $this->middleware('permission:' . permissions::$store, ['only' => ['edit', 'delete', 'newStore']]);
-        $this->middleware('storeAccess', ['except' => ['newOrder']]);
+        $this->middleware('storeAccess', ['except' => ['newOrder', 'allStores', 'select']]);
 
     }
     public function get($id)
