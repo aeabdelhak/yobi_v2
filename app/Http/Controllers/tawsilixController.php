@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\eventStatus;
 use App\Enums\orderStatus;
 use App\Enums\sharedStatus;
+use App\Models\event;
 use App\Models\order;
 use App\Models\orderChange;
 use App\Models\shippServices;
@@ -23,6 +25,8 @@ class tawsilixController extends Controller
     public function checkStatus($id)
     {
         echo "-check for $id \n";
+        echo "      ram usage" . memory_get_usage() . "\n";
+
         $time = time();
 
         $shipp = shippServices::where('id_shipping', $id)->first();
@@ -128,12 +132,29 @@ class tawsilixController extends Controller
 
     public function updateOrderStatus()
     {
-        echo "----------- start checking -----------  \n";
-        $orders = shippServices::join('orders', 'orders.id', 'shipp_services.id_order')->where('shipp_services.status', sharedStatus::$active)->get(DB::raw('id_shipping,id_order,orders.status,shipp_services.id'));
-        foreach ($orders as $key => $order) {
-            $this->checkStatus($order->id_shipping);
+        $event = event::where('label', 'tawsilix refreshing')->where('status', eventStatus::$new)->first();
+        if ($event) {
+            return;
         }
-        echo "----------- end checking ----------- \n";
+        $event = new event();
+        $event->label = 'tawsilix refreshing';
+        $event->started_at = DB::raw('CURRENT_TIMESTAMP');
+        $event->save();
+        $orders = shippServices::join('orders', 'orders.id', 'shipp_services.id_order')->where('shipp_services.status', sharedStatus::$active)->get(DB::raw('id_shipping,id_order,orders.status,shipp_services.id'));
+        $status = eventStatus::$success;
+        $event->refresh();
+        try {
+            foreach ($orders as $key => $order) {
+                $this->checkStatus($order->id_shipping);
+            }
+        } catch (\Throwable$th) {
+            $status = eventStatus::$error;
+        }
+
+        $event->ended_at = DB::raw('CURRENT_TIMESTAMP');
+        $event->status = $status;
+
+        $event->save();
 
     }
 
