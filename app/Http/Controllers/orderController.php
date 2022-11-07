@@ -189,7 +189,7 @@ class orderController extends Controller
 
         $landingsId = landingPage::ofStore($store)->pluck('id');
 
-        return order::whereIn('id_landing_page', $landingsId)->where(function ($query) use ($req) {
+        $orders = order::whereIn('id_landing_page', $landingsId)->where(function ($query) use ($req) {
             if ($req->search) {
                 return $query->where('name', 'like', '%' . $req->search . '%')->orwhere('phone', 'like', '%' . $req->search . '%');
             }
@@ -199,6 +199,19 @@ class orderController extends Controller
                 return $query->whereIn('status', explode(',', $req->status));
             }
         })->NotDeleted()->orderby('created_at', 'desc')->paginate(20);
+        return response($orders);
+    }
+    public function getDelayedTotoday(Request $req)
+    {
+        $store = $req->cookie(constants::$storeCookieName);
+        $landingsId = landingPage::ofStore($store)->pluck('id');
+
+        $orders = order::whereIn('id_landing_page', $landingsId)
+            ->wherein('status', [EnumsOrderStatus::$delayed, EnumsOrderStatus::$callRequested])
+            ->wheredate('status_date', DB::raw('Date(now())'))
+            ->NotDeleted()
+            ->orderby('created_at', 'desc')->get();
+        return response($orders);
 
     }
 

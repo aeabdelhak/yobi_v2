@@ -17,6 +17,7 @@ class order extends Model
         'city',
         'address',
         'status',
+        'status_date',
         'paid',
         'total_paid',
         'id_landing_page',
