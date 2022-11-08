@@ -69,6 +69,7 @@ class orderController extends Controller
         }
         return $price;
     }
+
     public function getOrderName($id)
     {
         $names = [];
@@ -151,8 +152,10 @@ class orderController extends Controller
             $detail->id_size = $req->id_size;
             $detail->price = $offer_price ?? $shape_price;
             $detail->save();
-
-            $res = $req->admin != null ? $order->refresh() : true;
+            $order = $order->refresh();
+            $res = $req->admin != null ? $order : true;
+            $order->total_paid = $this->getTotalPrice($order->id);
+            $order->save();
 
             return response()->json(['status' => 'success', 'data' => $res]);
         }

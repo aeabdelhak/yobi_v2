@@ -33,5 +33,13 @@ class store extends Model
     {
         return $this->hasManyThrough(User::class, storeAccess::class, 'id_store', 'id', 'id', 'id_user')->where('users.status', '!=', orderStatus::$deleted);
     }
+    public function landings()
+    {
+        return $this->hasMany(landingPage::class, 'id_store', 'id');
+    }
+    public function scopeId($q, $id)
+    {
+        return $q->where('id', $id);
+    }
 
 }

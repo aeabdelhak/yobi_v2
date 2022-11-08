@@ -25,7 +25,7 @@ class tawsilixController extends Controller
     public function checkStatus($id)
     {
         echo "-check for $id \n";
-        echo "      ram usage" . memory_get_usage() . "\n";
+        echo "      ram usage " . round(memory_get_usage() / 1024 / 1024) . " MB \n";
 
         $time = time();
 

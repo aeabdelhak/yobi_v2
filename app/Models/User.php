@@ -111,4 +111,10 @@ class User extends Authenticatable implements JWTSubject
         return ['permissions' => $this->getPermissions()];
     }
 
+    public function isAdmin()
+    {
+
+        return $this->status == userStatus::$superAdmin ? true : false;
+    }
+
 }

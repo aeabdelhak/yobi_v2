@@ -3,11 +3,14 @@
 namespace App\Http\Controllers;
 
 use App\Enums\constants;
+use App\Enums\orderStatus;
 use App\Enums\permissions;
 use App\Enums\sharedStatus;
 use App\Enums\userStatus;
 use App\Models\landingPage;
+use App\Models\order;
 use App\Models\store;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use PHPOpenSourceSaver\JWTAuth\Facades\JWTAuth;
@@ -22,6 +25,7 @@ class StoreController extends Controller
         $this->middleware('storeAccess', ['except' => ['newOrder', 'allStores', 'select']]);
 
     }
+
     public function get($id)
     {
         return store::where('stores.id', $id)
@@ -38,6 +42,7 @@ class StoreController extends Controller
         }
 
     }
+
     public function only(Request $req)
     {
         if ($req->fromCookie) {
@@ -227,4 +232,61 @@ class StoreController extends Controller
 
     }
 
+    public function dashboard(Request $req)
+    {
+        if (!JWTAuth::user()->isAdmin()) {
+            return response(null, 401);
+        }
+        $store = store::id($req->cookie(constants::$storeCookieName))->with(['landings'])->first();
+        $ids = [];
+
+        foreach ($store->landings as $key => $value) {
+            $ids[] = $value->id;
+        }
+
+        $allOver = order::whereIn('id_landing_page', $ids)
+            ->whereNotIn('status', [
+                orderStatus::$canceled,
+                orderStatus::$new,
+                orderStatus::$returned,
+                orderStatus::$deleted,
+            ])->sum('total_paid');
+        $thisMonth = order::whereIn('id_landing_page', $ids)
+            ->whereNotIn('status', [
+                orderStatus::$canceled,
+                orderStatus::$new,
+                orderStatus::$returned,
+                orderStatus::$deleted,
+
+            ])->whereMonth('created_at', DB::raw('MONTH(CURDATE())'))->sum('total_paid');
+        $lastSunday = Carbon::now()->isDayOfWeek(0) ?
+        Carbon::now()->toDateString()
+        : Carbon::now()
+            ->previous(0)
+            ->toDateString();
+        $nextSaturday = Carbon::now()
+            ->nextWeekendDay()
+            ->toDateString();
+
+        $thisWeek = order::whereIn('id_landing_page', $ids)
+            ->whereNotIn('status', [
+                orderStatus::$canceled,
+                orderStatus::$new,
+                orderStatus::$returned,
+                orderStatus::$deleted,
+            ])->whereBetween(DB::raw('DATE(created_at)'), [date($lastSunday), date($nextSaturday)])
+            ->sum('total_paid');
+        $thisDay = order::whereIn('id_landing_page', $ids)
+            ->whereNotIn('status', [
+                orderStatus::$canceled,
+                orderStatus::$new,
+                orderStatus::$returned,
+                orderStatus::$deleted,
+
+            ])->whereDate('created_at', DB::raw('DATE(CURDATE())'))->sum('total_paid');
+
+        $lastOrders = order::whereIn('id_landing_page', $ids)->NotDeleted()->orderby('created_at', 'desc')->take(6)->get();
+
+        return response(compact('allOver', 'thisMonth', 'thisDay', 'thisWeek', 'lastOrders'));
+    }
 }

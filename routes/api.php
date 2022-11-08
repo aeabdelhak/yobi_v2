@@ -46,6 +46,7 @@ Route::middleware('refToken')->group(function () {
         Route::delete('store/delete', 'delete');
         Route::post('store/edit', 'edit');
         Route::get('store/client', 'client');
+        Route::get('store/dashboard', 'dashboard');
 
     });
     Route::controller(colorPalleteController::class)->group(function () {
