@@ -8,6 +8,7 @@ use App\Enums\permissions;
 use App\Enums\sharedStatus;
 use App\Models\color;
 use App\Models\detail;
+use App\Models\event;
 use App\Models\hasOffer;
 use App\Models\landingPage;
 use App\Models\offer;
@@ -164,7 +165,7 @@ class orderController extends Controller
 
     public function isSyncing()
     {
-        return order::where('label', 'tawsilix refreshing')->orderby('created_at', 'desc')->first();
+        return event::where('label', 'tawsilix refreshing')->orderby('created_at', 'desc')->first();
     }
 
     public function getStatistics(Request $req)
