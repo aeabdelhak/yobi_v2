@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\Http\Controllers\tawsilixController;
 use Illuminate\Console\Command;
 
 class updateStatus extends Command
@@ -11,7 +12,7 @@ class updateStatus extends Command
      *
      * @var string
      */
-    protected $signature = 'tawsilix:update';
+    protected $signature = 'tawsilix:force';
 
     /**
      * The console command description.
@@ -28,7 +29,7 @@ class updateStatus extends Command
     public function handle()
     {
 
-/*         (new tawsilixController())->updateOrderStatus();
- */return Command::SUCCESS;
+        (new tawsilixController())->updateOrderStatus();
+        return Command::SUCCESS;
     }
 }
