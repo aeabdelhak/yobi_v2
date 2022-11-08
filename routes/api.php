@@ -115,6 +115,7 @@ Route::middleware('refToken')->group(function () {
         Route::post('order/push', 'pushToDelivery');
         Route::post('order/delete', 'delete');
         Route::get('order/delayed', 'getDelayedTotoday');
+        Route::get('order/isSyncing', 'isSyncing');
         Route::get('order/history/{id}', 'history');
         Route::get('order/name/{id}', 'getOrderName');
         Route::get('order/{id}', 'getOrder');

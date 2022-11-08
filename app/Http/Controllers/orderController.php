@@ -162,6 +162,11 @@ class orderController extends Controller
 
     }
 
+    public function isSyncing()
+    {
+        return order::where('label', 'tawsilix refreshing')->orderby('created_at', 'desc')->first();
+    }
+
     public function getStatistics(Request $req)
     {
         $landingsId = landingPage::ofStore($req->storeId)->pluck('id');
@@ -188,10 +193,9 @@ class orderController extends Controller
 
     public function getOrders(Request $req)
     {
+
         $store = $req->cookie(constants::$storeCookieName);
-
         $landingsId = landingPage::ofStore($store)->pluck('id');
-
         $orders = order::whereIn('id_landing_page', $landingsId)->where(function ($query) use ($req) {
             if ($req->search) {
                 return $query->where('name', 'like', '%' . $req->search . '%')->orwhere('phone', 'like', '%' . $req->search . '%');

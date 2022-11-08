@@ -29,6 +29,7 @@ class updatePrice extends Command
      */
     public function handle()
     {
+
         $start = time();
         echo "start \n";
 
