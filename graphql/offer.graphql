@@ -6,19 +6,19 @@ input OfferConstrunct {
     id_landing_page: ID!
 }
 
-type Offer {
+type offer {
     id: ID
     label: String!
     original_price: Float!
     promotioned_price: Float!
     status: Int!
-    landing: LandingPage! @belongsTo
+    landing: landingPage! @belongsTo
 }
 
 extend type Mutation @guard {
-    newOffer(input: OfferConstrunct @spread): Offer! @create
-    deleteOffer(id: ID!): Offer @delete
+    newOffer(input: OfferConstrunct @spread): offer! @create
+    deleteOffer(id: ID!): offer @delete
 }
 extend type Query @guard {
-    offer(id: ID! @eq): Offer @find
+    offer(id: ID! @eq): offer @find
 }

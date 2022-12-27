@@ -1,13 +1,13 @@
-type UserResult {
+type userResult {
     id: ID!
-    file: File
-    landing: LandingPage
+    file: file
+    landing: landingPage
 }
 
 extend type Mutation @guard {
-    deleteUserResult(id: ID!): UserResult @delete
+    deleteUserResult(id: ID!): userResult @delete
 }
 extend type Query @guard {
-    userResult(id: ID! @eq): UserResult! @find
-    usersResults: [UserResult] @all
+    userResult(id: ID! @eq): userResult! @find
+    usersResults: [userResult] @all
 }

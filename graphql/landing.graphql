@@ -1,4 +1,4 @@
-type LandingPage {
+type landingPage {
     id: ID!
     name: String!
     domain: String!
@@ -6,15 +6,15 @@ type LandingPage {
     product_name: String!
     product_description: String
     status: Int!
-    store: Store!
-    pallete: Pallete!
+    store: store!
+    pallete: pallete!
     audios: [Audio] @hasMany
-    poster: File
-    shapes: [Shape] @hasMany
-    offers: [Offer] @hasMany
-    images: [Image] @hasMany
-    results: [UserResult] @hasMany
-    cards: [Card] @hasMany
+    poster: file
+    shapes: [shape] @hasMany
+    offers: [offer] @hasMany
+    images: [image] @hasMany
+    results: [userResult] @hasMany
+    cards: [card] @hasMany
 }
 
 
@@ -26,13 +26,13 @@ type LandingPageForClient @model(class: "landingPage") {
     product_name: String!
     product_description: String
     status: Int!
-    store: Store!
-    pallete: Pallete!
-    audios: [Audio] @hasMany
-    poster: File
+    store: store!
+    pallete: pallete!
+    audios: [audio] @hasMany
+    poster: file
     activatedShapes: [ShapeForClient] @hasMany
-    shapes: [Shape] @hasMany
-    offers: [Offer] @hasMany
+    shapes: [shape] @hasMany
+    offers: [offer] @hasMany
 }
 
 extend type Query {
@@ -40,6 +40,6 @@ extend type Query {
 }
 
 extend type Query  @guard{
-    landingsPages(id_store: ID! @eq): [LandingPage] @all
-    landingPage(id: ID! @eq): LandingPage @first
+    landingsPages(id_store: ID! @eq): [landingPage] @all
+    landingPage(id: ID! @eq): landingPage @first
 }

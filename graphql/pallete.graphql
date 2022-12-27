@@ -1,4 +1,4 @@
-type Pallete @model(class: "colorPalette") {
+type pallete @model(class: "colorPalette") {
     id: ID!
     name: String!
     background: String!
@@ -14,10 +14,10 @@ input palleteInput {
     secondary: String!
 }
 extend type Query @guard {
-    pallete(id: ID! @eq): Pallete @find
-    palletes: [Pallete] @all
+    pallete(id: ID! @eq): pallete @find
+    palletes: [pallete] @all
 }
 extend type Mutation @guard {
-    newPallete(model: palleteInput! @spread): Pallete! @create
-    deletePallete(id: ID! @eq): Pallete @delete
+    newPallete(model: palleteInput! @spread): pallete! @create
+    deletePallete(id: ID! @eq): pallete @delete
 }

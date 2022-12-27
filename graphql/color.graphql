@@ -1,10 +1,10 @@
 
-type Color {
+type color {
     id: ID!
     name: String!
     status: Int!
     color_code: String!
-    image: File
-    size: [Size]
-    offers: [Offer]
+    image: file
+    size: [size]
+    offers: [offer]
 }

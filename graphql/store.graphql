@@ -1,4 +1,4 @@
-type Store {
+type store {
     id: ID!
     name: String!
     description: String
@@ -10,9 +10,9 @@ type Store {
     facebook: String
     tiktok: String
     google: String
-    icon: File
-    orders: [Order]! @paginate
-    landings: [LandingPage]
+    icon: file
+    orders: [order]! @paginate
+    landings: [landingPage]
 }
 
 type StoreForClient {
@@ -24,15 +24,15 @@ type StoreForClient {
     facebook: String
     tiktok: String
     google: String
-    icon: File
-    landings: [LandingPage]
+    icon: file
+    landings: [landingPage]
 }
 
 extend type Query  {
-    getStore(id: ID! @eq): Store @find
+    getStore(id: ID! @eq): store @find
 }
 extend type Query @guard  {
-    stores: [Store] @all
+    stores: [store] @all
        choseStore(storeId: ID!): ChoseStoreResponse!
         @field(resolver: "StoreQueries@choseStore")
 }

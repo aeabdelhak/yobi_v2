@@ -1,4 +1,4 @@
-type Order {
+type order {
     id: ID!
     name: String!
     phone: String!
@@ -8,21 +8,21 @@ type Order {
     status_date: String
     paid: Float!
     total_paid: Float
-    landing: LandingPage!
-    details: [Detail] @hasMany
+    landing: landingPage!
+    details: [detail] @hasMany
 }
 
 type OrdersStatistics {
     status: Int
     count: Int
 }
-type OrderChange {
+type orderChange {
     id: ID!
     status: Int!
     to_date: String
     note: String
     created_at: DateTime
-    order: Order!
+    order: order!
     admin: User
 }
 
@@ -43,7 +43,7 @@ extend type Query  {
         @field(resolver: "OrdersQueries@statistics")
 
 
-    orderHistory(id_order: ID! @eq): [OrderChange]
+    orderHistory(id_order: ID! @eq): [orderChange]
         @orderBy(column: "created_at", direction: "DESC")
         @all
 
@@ -51,7 +51,7 @@ extend type Query  {
 }
 extend type Mutation @guard {
     deleteOrder(ids: [ID!]): Int! @field(resolver: "OrderMutator@delete")
-    newOrder(model: newOrderInput): Order
+    newOrder(model: newOrderInput): order
         @field(resolver: "OrderMutator@newOrder")
 }
 
@@ -78,5 +78,5 @@ type Orders {
    to:  Int,
    page:  Int,
    pages:  Int,
-   data:[Order]
+   data:[order]
 }

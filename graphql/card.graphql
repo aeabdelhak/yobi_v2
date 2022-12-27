@@ -1,11 +1,11 @@
 
-type Card {
+type card {
         id:ID!
         title:String!
         status:Int!
         body:String
-        landing:LandingPage @belongsTo
+        landing:landingPage @belongsTo
 }
 extend type Query @guard {
-    card(id: ID! @eq): Card @find
+    card(id: ID! @eq): card @find
 }

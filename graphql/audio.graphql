@@ -1,11 +1,11 @@
-type Audio {
+type audio {
     id: ID
     owner: String
-    file: File
+    file: file
 }
 
 extend type Mutation @guard {
-    newAudio(audio: Upload!, owner: String!, id_landing_page: ID!): Audio
+    newAudio(audio: Upload!, owner: String!, id_landing_page: ID!): audio
         @field(resolver: "AudioMutator@newAudio")
 
     deleteAudio(id: ID!): Boolean @field(resolver: "AudioMutator@delete")
