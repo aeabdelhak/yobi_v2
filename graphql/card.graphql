@@ -1,0 +1,11 @@
+
+type Card {
+        id:ID!
+        title:String!
+        status:Int!
+        body:String
+        landing:LandingPage @belongsTo
+}
+extend type Query @guard {
+    card(id: ID! @eq): Card @find
+}

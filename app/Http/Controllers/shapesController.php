@@ -35,22 +35,7 @@ class shapesController extends Controller
             ]);
         }}
 
-    public function get(Request $req)
-    {
-        try {
-            $landing = landingPage::findorfail($req->id);
-            $shape = shape::landing($req->id)->whereid($req->shapeId)->firstorfail();
-        } catch (Throwable $e) {
-            return response(null, 404);
-        }
 
-        $colors = color::leftJoin('files', 'files.id', 'id_image')->ofshape($shape->id)->get(DB::raw('colors.name,color_code,colors.id,url,status'));
-        return response()->json([
-            'landing' => $landing,
-            'shape' => $shape,
-            'colors' => $colors,
-        ]);
-    }
     public function edit(Request $req)
     {
 

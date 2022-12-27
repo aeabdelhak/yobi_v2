@@ -1,0 +1,44 @@
+input ShapeConstrunct {
+    name: String!
+    description: String
+    original_price: Float!
+    promotioned_price: Float
+    id_landing_page: ID!
+}
+type Shape {
+    id: ID!
+    name: String!
+    description: String
+    original_price: Float!
+    promotioned_price: Float
+    status: Int!
+    landing: LandingPage! @belongsTo
+    colors: [Color] @hasMany
+}
+
+type ShapeForClient @model(class: "shape") {
+    id: ID!
+    name: String!
+    description: String
+    original_price: Float!
+    promotioned_price: Float
+    status: Int!
+    colors: [Color] @hasMany
+    activatedColors: [Color] @hasMany
+}
+
+extend type Mutation @guard {
+    newShape(model: ShapeConstrunct @spread): Shape! @create
+    deleteSahpe(id: ID!): Shape @delete
+    shape(id: ID!): Shape @find
+    editShape(
+        id: ID!
+        name: String
+        original_price: Float
+        promotioned_price: Float
+        status: Int
+    ): Shape @update
+}
+extend type Query @guard {
+    shape(id: ID! @eq): Shape @find
+}

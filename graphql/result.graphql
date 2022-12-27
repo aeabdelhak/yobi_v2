@@ -1,0 +1,13 @@
+type UserResult {
+    id: ID!
+    file: File
+    landing: LandingPage
+}
+
+extend type Mutation @guard {
+    deleteUserResult(id: ID!): UserResult @delete
+}
+extend type Query @guard {
+    userResult(id: ID! @eq): UserResult! @find
+    usersResults: [UserResult] @all
+}

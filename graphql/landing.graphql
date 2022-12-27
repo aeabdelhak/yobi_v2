@@ -1,0 +1,45 @@
+type LandingPage {
+    id: ID!
+    name: String!
+    domain: String!
+    description: String
+    product_name: String!
+    product_description: String
+    status: Int!
+    store: Store!
+    pallete: Pallete!
+    audios: [Audio] @hasMany
+    poster: File
+    shapes: [Shape] @hasMany
+    offers: [Offer] @hasMany
+    images: [Image] @hasMany
+    results: [UserResult] @hasMany
+    cards: [Card] @hasMany
+}
+
+
+type LandingPageForClient @model(class: "landingPage") {
+    id: ID!
+    name: String!
+    domain: String!
+    description: String
+    product_name: String!
+    product_description: String
+    status: Int!
+    store: Store!
+    pallete: Pallete!
+    audios: [Audio] @hasMany
+    poster: File
+    activatedShapes: [ShapeForClient] @hasMany
+    shapes: [Shape] @hasMany
+    offers: [Offer] @hasMany
+}
+
+extend type Query {
+    landingForClient(domain: String! @eq): LandingPageForClient @first
+}
+
+extend type Query  @guard{
+    landingsPages(id_store: ID! @eq): [LandingPage] @all
+    landingPage(id: ID! @eq): LandingPage @first
+}

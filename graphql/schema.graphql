@@ -1,0 +1,44 @@
+scalar Upload
+    @scalar(class: "Nuwave\\Lighthouse\\Schema\\Types\\Scalars\\Upload")
+scalar DateTime
+  @scalar(class: "Nuwave\\Lighthouse\\Schema\\Types\\Scalars\\DateTime")
+  
+type File {
+    id: ID!
+    name: String!
+    path: String!
+    url: String!
+    type: String!
+}
+
+
+type Size {
+    id: ID!
+    label: String!
+    status: Int!
+}
+
+type Detail {
+    id: ID!
+    amount: Int
+    price: Float!
+    color: Color
+    size: Size
+    offer: Offer
+    shape: Shape
+}
+
+#import response.graphql
+#import auth.graphql
+#import audio.graphql
+#import shape.graphql
+#import offer.graphql
+#import image.graphql
+#import order.graphql
+#import store.graphql
+#import landing.graphql
+#import pallete.graphql
+#import color.graphql
+#import result.graphql
+#import orderChange.graphql
+#import card.graphql

@@ -1,0 +1,13 @@
+type orderChange {
+    id: ID!
+    status: Int!
+    to_date: DateTime
+    note: String
+    id_order: ID!
+    admin:User
+    created_at: DateTime
+}
+
+extend type Query @guard {
+    orderChange(id_order: ID! @eq): [orderChange] @All
+}

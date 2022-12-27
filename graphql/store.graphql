@@ -1,0 +1,39 @@
+type Store {
+    id: ID!
+    name: String!
+    description: String
+    status: Int!
+    token: String!
+    secret_token: String!
+    fecebook_meta_tag: String
+    domain: String!
+    facebook: String
+    tiktok: String
+    google: String
+    icon: File
+    orders: [Order]! @paginate
+    landings: [LandingPage]
+}
+
+type StoreForClient {
+    id: ID!
+    name: String!
+    description: String
+    status: Int!
+    fecebook_meta_tag: String
+    facebook: String
+    tiktok: String
+    google: String
+    icon: File
+    landings: [LandingPage]
+}
+
+extend type Query  {
+    getStore(id: ID! @eq): Store @find
+}
+extend type Query @guard  {
+    stores: [Store] @all
+       choseStore(storeId: ID!): ChoseStoreResponse!
+        @field(resolver: "StoreQueries@choseStore")
+}
+

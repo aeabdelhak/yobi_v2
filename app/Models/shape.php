@@ -27,9 +27,13 @@ class shape extends Model
 
     public function colors()
     {
+        return $this->hasMany(color::class, 'id_shape');
+    }
+    public function activatedColors()
+    {
         return $this->hasMany(color::class, 'id_shape')->where('status', sharedStatus::$active);
     }
-    public function landingPage()
+    public function landing()
     {
         return $this->belongsTo(landingPage::class, 'id_landing_page', 'id');
     }

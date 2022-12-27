@@ -2,15 +2,20 @@
 
 namespace App\Models;
 
-use App\Enums\userStatus;
+use App\Enums\userRoles;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasManyThrough;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Laravel\Sanctum\HasApiTokens;
 use PHPOpenSourceSaver\JWTAuth\Contracts\JWTSubject;
 
 class User extends Authenticatable implements JWTSubject
 {
-    use HasFactory, Notifiable;
+    use HasFactory,SoftDeletes;
+    
+
 
     /**
      * The attributes that are mass assignable.
@@ -22,7 +27,7 @@ class User extends Authenticatable implements JWTSubject
         'name',
         'email',
         'password',
-        'status',
+        'active',
         'id_avatar',
 
     ];
@@ -69,7 +74,7 @@ class User extends Authenticatable implements JWTSubject
     {
         $user = static::where('id', $iduser)->first();
 
-        if ($user->status == userStatus::$superAdmin) {
+        if ($user->role == userRoles::$superAdmin) {
             return true;
         }
 
@@ -85,7 +90,7 @@ class User extends Authenticatable implements JWTSubject
 
     public function hasAccess($store)
     {
-        if ($this->status == userStatus::$superAdmin) {
+        if ($this->role == userRoles::$superAdmin) {
             return true;
         }
 
@@ -94,6 +99,10 @@ class User extends Authenticatable implements JWTSubject
     public function Permissions()
     {
         return $this->getPermissions();
+    }
+    public function abilities()
+    {
+        return $this->hasManyThrough(permission::class, hasPermission::class, 'id_permission', 'id', 'id', 'id_user');
     }
 
     public static function getAccess($id)
@@ -108,13 +117,25 @@ class User extends Authenticatable implements JWTSubject
      */
     public function getJWTCustomClaims()
     {
-        return ['permissions' => $this->getPermissions()];
+         return ['role'=>$this->role];
     }
 
     public function isAdmin()
     {
 
-        return $this->status == userStatus::$superAdmin ? true : false;
+        return $this->role == userRoles::$superAdmin ? true : false;
     }
+
+    public function avatar()
+    {
+        return $this->hasOne(file::class, 'id', 'id_avatar');
+    }
+
+    public function stores()
+    {
+        return   $this->hasManyThrough(store::class,storeAccess::class, 'id_store','id','id','id_user');
+    }
+
+
 
 }

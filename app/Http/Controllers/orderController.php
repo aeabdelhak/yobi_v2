@@ -6,6 +6,7 @@ use App\Enums\constants;
 use App\Enums\orderStatus as EnumsOrderStatus;
 use App\Enums\permissions;
 use App\Enums\sharedStatus;
+use App\Http\operations\orderOperations;
 use App\Models\color;
 use App\Models\detail;
 use App\Models\event;
@@ -48,28 +49,6 @@ class orderController extends Controller
 
     }
 
-    public function getTotalPrice($id)
-    {
-        $order = order::find($id);
-        if (!$order) {
-            return NAN;
-        }
-        $price = 0;
-        if ($order->total_paid != null) {
-            return $order->total_paid;
-        }
-
-        foreach ($order->details as $key => $detail) {
-
-            $offer = offer::find($detail->id_offer);
-            $offer_price = $offer ? ($offer->promotioned_price ?? $offer->original_price) : null;
-            $shape = shape::find($detail->id_shape);
-            $shape_price = $shape->promotioned_price ?? $shape->original_price;
-
-            $price += $offer_price ?? $shape_price;
-        }
-        return $price;
-    }
 
     public function getOrderName($id)
     {
@@ -117,49 +96,12 @@ class orderController extends Controller
 
     public function newOrder(Request $req)
     {
-        $order = new order();
-        $order->name = $req->name;
-        $order->city = $req->city;
-        $order->address = $req->address;
-        $order->phone = $req->phone;
-        $order->id_landing_page = $req->id;
-        if ($order->save()) {
+       $order=orderOperations::newOrder($req);
+       if($order)
+       return response()->json(['suucess'=>true]);
+       return response()->json(['suucess'=>false]);
 
-            $shape = shape::id($req->id_shape)->active()->first();
-            if (!$shape) {
-                return res('fail', 'some parametres are missing');
-            }
-            if ($req->id_size) {
-                $sizeExist = size::id($req->id_size)->active()->first();
-                if (!$sizeExist) {
-                    return res('fail', 'size not found , or desactivated');
-                }
-            }
-
-            $colorExist = color::id($req->id_color)->active()->first();
-            if (!$colorExist) {
-                return res('fail', 'color is required');
-            }
-            $offer = hasOffer::joinOffer()->where('id_color', $req->id_color)->where('has_offers.status', sharedStatus::$active)->where('offers.status', sharedStatus::$active)->first();
-
-            $offer_price = $offer ? ($offer->promotioned_price ?? $offer->original_price) : null;
-            $shape_price = $shape ? $shape->promotioned_price ?? $shape->original_price : 0;
-
-            $detail = new detail();
-            $detail->id_color = $req->id_color;
-            $detail->id_order = $order->id;
-            $detail->id_shape = $req->id_shape;
-            $detail->id_offer = $offer ? $req->id_offer : null;
-            $detail->id_size = $req->id_size;
-            $detail->price = $offer_price ?? $shape_price;
-            $detail->save();
-            $order = $order->refresh();
-            $res = $req->admin != null ? $order : true;
-            $order->total_paid = $this->getTotalPrice($order->id);
-            $order->save();
-
-            return response()->json(['status' => 'success', 'data' => $res]);
-        }
+        
 
     }
 
@@ -325,13 +267,21 @@ class orderController extends Controller
     public function history($id)
     {
         return orderChange::leftjoin('users', 'users.id', 'order_changes.id_user')->leftjoin('files', 'users.id_avatar', 'files.id')->orderby('order_changes.created_at', 'desc')->oforder($id)->get(DB::raw('order_changes.status,note,users.name,email,order_changes.created_at date ,to_date ,url avatar'));
-
     }
 
     public function delete(Request $request)
     {
         order::wherein('id', $request->ids)->update(['status' => EnumsOrderStatus::$deleted]);
         return res('success', 'orders successfully deleted ', true);
+    }
+    public function deleteOrder(int $id)
+    {
+        $delete = order::id($id)->delete();
+        if ($delete) {
+            return true;
+        }
+        return false;
+
     }
 
 }

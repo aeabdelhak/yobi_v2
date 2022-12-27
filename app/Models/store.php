@@ -5,15 +5,15 @@ namespace App\Models;
 use App\Enums\orderStatus;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class store extends Model
 {
-    use HasFactory;
+    use HasFactory,SoftDeletes;
     protected $fillable = [
         'id',
         'name',
         'description',
-        'link',
         'status',
         'token',
         'secret_token',
@@ -31,12 +31,18 @@ class store extends Model
     }
     public function users()
     {
-        return $this->hasManyThrough(User::class, storeAccess::class, 'id_store', 'id', 'id', 'id_user')->where('users.status', '!=', orderStatus::$deleted);
+        return $this->hasManyThrough(User::class, storeAccess::class, 'id_store', 'id', 'id', 'id_user');
     }
     public function landings()
     {
         return $this->hasMany(landingPage::class, 'id_store', 'id');
     }
+
+    public function orders()
+    {
+        return $this->hasMany(order::class, 'id_store', 'id')->where('status', '!=', orderStatus::$deleted);
+    }
+
     public function scopeId($q, $id)
     {
         return $q->where('id', $id);

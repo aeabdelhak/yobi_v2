@@ -1,0 +1,20 @@
+type AuthenticateResponse {
+    token: String
+    user: User
+    stores:[Store]
+    status: Int!
+}
+type ChoseStoreResponse {
+    token: String
+    user: User
+    status: Int!
+}
+type newUserResponse {
+    user: User
+    status: Int!
+}
+
+type Init {
+    user: User
+    store: Store
+}

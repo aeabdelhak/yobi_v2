@@ -9,13 +9,11 @@ class event extends Model
 {
     use HasFactory;
     protected $fillable = [
-        'amount',
-        'price',
-        'id_shape',
-        'id_size',
-        'id_color',
-        'id_order',
-        'id_offer',
+        'label',
+        'description',
+        'started_at',
+        'ended_at',
+        'status',
 
     ];
 }

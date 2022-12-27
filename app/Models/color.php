@@ -21,15 +21,25 @@ class color extends Model
     ];
     public function shape()
     {
-        $this->belongsTo(shape::class, 'id_shape');
+        return  $this->belongsTo(shape::class, 'id_shape');
+    }
+    public function image()
+    {
+        return  $this->hasOne(file::class, 'id','id_image');
     }
     public function sizes()
     {
-        $this->hasMany(size::class, 'id_color');
+        return $this->hasMany(size::class, 'id_color');
     }
+    public function offers()
+    {
+        return   $this->hasManyThrough(offer::class,hasOffer::class, 'id_offer','id','id','id_color');
+    }
+
+
     public function scopeOfShape($query, $id)
     {
-        $query->where('id_shape', $id);
+        return   $query->where('id_shape', $id);
     }
     public static function hasManySizes($id)
     {
@@ -41,10 +51,10 @@ class color extends Model
     }
     public function scopeActive($query)
     {
-        $query->where('status', sharedStatus::$active);
+        return   $query->where('status', sharedStatus::$active);
     }
     public function scopeId($query, $id)
     {
-        $query->where('id', $id);
+        return  $query->where('id', $id);
     }
 }

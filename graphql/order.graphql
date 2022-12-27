@@ -1,0 +1,82 @@
+type Order {
+    id: ID!
+    name: String!
+    phone: String!
+    city: String!
+    address: String!
+    status: String!
+    status_date: String
+    paid: Float!
+    total_paid: Float
+    landing: LandingPage!
+    details: [Detail] @hasMany
+}
+
+type OrdersStatistics {
+    status: Int
+    count: Int
+}
+type OrderChange {
+    id: ID!
+    status: Int!
+    to_date: String
+    note: String
+    created_at: DateTime
+    order: Order!
+    admin: User
+}
+
+extend type Query  {
+    orders(
+        first:Int!,
+        page:Int!,
+        status:[Int]
+        search:String,
+    ): Orders!    
+             @field(resolver: "OrdersQueries@orders")
+
+
+    order(id: ID! @eq, id_store: ID! @eq): Order @first
+
+
+    ordersStatistics(id_store: ID!): [OrdersStatistics]
+        @field(resolver: "OrdersQueries@statistics")
+
+
+    orderHistory(id_order: ID! @eq): [OrderChange]
+        @orderBy(column: "created_at", direction: "DESC")
+        @all
+
+
+}
+extend type Mutation @guard {
+    deleteOrder(ids: [ID!]): Int! @field(resolver: "OrderMutator@delete")
+    newOrder(model: newOrderInput): Order
+        @field(resolver: "OrderMutator@newOrder")
+}
+
+input newOrderInput {
+    name: String!
+    phone: String!
+    city: String!
+    address: String!
+    id_landing_page: ID!
+    id_store: ID!
+    details: [detailInput]!
+}
+input detailInput {
+    id_shape: ID!
+    id_color: ID!
+    id_size: ID
+    id_offer: ID
+    amount: Int!
+}
+
+type Orders {
+   total: Int,
+   from: Int,
+   to:  Int,
+   page:  Int,
+   pages:  Int,
+   data:[Order]
+}

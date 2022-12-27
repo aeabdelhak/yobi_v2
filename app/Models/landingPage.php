@@ -2,15 +2,18 @@
 
 namespace App\Models;
 
+use App\Enums\orderStatus;
 use App\Enums\sharedStatus;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\DB;
 
 class landingPage extends Model
 {
     use HasFactory;
 
     protected $fillable = [
+
         'id',
         'name',
         'domain',
@@ -25,15 +28,36 @@ class landingPage extends Model
     ];
     public function shapes()
     {
-        return $this->hasMany(shape::class, 'id_landing_page', 'id')->where('status', sharedStatus::$active);
+        return $this->hasMany(shape::class, 'id_landing_page', 'id');
+    }
+    public function activatedShapes()
+    {
+        return $this->hasMany(shape::class, 'id_landing_page', 'id')->where('shapes.status', sharedStatus::$active);
     }
     public function audios()
     {
         return $this->hasMany(audio::class, 'id_landing_page', 'id')->where('status', sharedStatus::$active);
     }
+    public function images()
+    {
+        return $this->hasMany(image::class, 'id_landing_page', 'id');
+    }
+    public function offers()
+    {
+        return $this->hasMany(offer::class, 'id_landing_page', 'id');
+    }
+    public function results()
+    {
+        return $this->hasMany(userResult::class, 'id_landing_page', 'id');
+    }
+
     public function cards()
     {
         return $this->hasMany(card::class, 'id_landing_page', 'id')->where('status', sharedStatus::$active);
+    }
+    public function orders()
+    {
+        return $this->hasMany(order::class, 'id_landing_page', 'id')->where('status', '!=', orderStatus::$deleted);
     }
     public function poster()
     {
