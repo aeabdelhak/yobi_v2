@@ -7,12 +7,14 @@ use App\Enums\orderStatus;
 use App\Enums\permissions;
 use App\Enums\sharedStatus;
 use App\Enums\userStatus;
+use App\Exports\OrdersExport;
 use App\Models\landingPage;
 use App\Models\order;
 use App\Models\store;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Maatwebsite\Excel\Excel;
 use PHPOpenSourceSaver\JWTAuth\Facades\JWTAuth;
 use Throwable;
 
@@ -20,9 +22,9 @@ class StoreController extends Controller
 {
     public function __construct()
     {
-        $this->middleware('auth:api', ['except' => 'client']);
+        $this->middleware('auth:api', ['except' => ['client', 'exportDataToExcel']]);
         $this->middleware('permission:' . permissions::$store, ['only' => ['edit', 'delete', 'newStore']]);
-        $this->middleware('storeAccess', ['except' => ['newOrder', 'allStores', 'select']]);
+        $this->middleware('storeAccess', ['except' => ['newOrder', 'allStores', 'exportDataToExcel', 'select']]);
 
     }
 
@@ -288,5 +290,13 @@ class StoreController extends Controller
         $lastOrders = order::whereIn('id_landing_page', $ids)->NotDeleted()->orderby('created_at', 'desc')->take(6)->get();
 
         return response(compact('allOver', 'thisMonth', 'thisDay', 'thisWeek', 'lastOrders'));
+    }
+
+    public function exportDataToExcel(Request $req)
+    {
+
+        $id = $req->id;
+        return (new OrdersExport)->download('orders.xlsx', Excel::XLSX);
+
     }
 }

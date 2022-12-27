@@ -20,6 +20,9 @@ use App\Http\Controllers\userResultsController;
 use App\Http\Controllers\vercelController;
 use Illuminate\Support\Facades\Route;
 
+
+
+
 Route::middleware('refToken')->group(function () {
     Route::controller(AuthController::class)->group(function () {
         Route::post('login', 'login');
@@ -47,6 +50,7 @@ Route::middleware('refToken')->group(function () {
         Route::post('store/edit', 'edit');
         Route::get('store/client', 'client');
         Route::get('store/dashboard', 'dashboard');
+        Route::get('store/toExcel', 'exportDataToExcel');
 
     });
     Route::controller(colorPalleteController::class)->group(function () {

@@ -37,4 +37,11 @@ class orderChange extends Model
         return $query->where('id_order', $id);
     }
 
+    public function order(){
+        return $this->belongsTo(order::class,'id_order');
+    }
+    public function admin(){
+        return $this->belongsTo(User::class,'id_user');
+    }
+
 }

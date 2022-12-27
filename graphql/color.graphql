@@ -1,0 +1,10 @@
+
+type Color {
+    id: ID!
+    name: String!
+    status: Int!
+    color_code: String!
+    image: File
+    size: [Size]
+    offers: [Offer]
+}

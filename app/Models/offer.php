@@ -5,10 +5,11 @@ namespace App\Models;
 use App\Enums\sharedStatus;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class offer extends Model
 {
-    use HasFactory;
+    use HasFactory,SoftDeletes;
     protected $fillable = [
         'id',
         'label',
@@ -16,9 +17,27 @@ class offer extends Model
         'promotioned_price',
         'status',
         'id_landing_page',
-        'id_image',
 
     ];
+
+    public static function boot() {
+        parent::boot();
+
+        static::deleting(function($offer) { // before delete() method call this
+             $offer->hasOffers()->delete();
+             // do the rest of the cleanup...
+        });
+    }
+
+    public function landing()
+    {
+        return $this->belongsTo(landingPage::class, 'id_landing_page');
+    }
+    public function hasOffers()
+    {
+        return $this->hasMany(hasOffer::class, 'id_offer');
+    }
+
     public function scopeId($query, $id)
     {
         $query->where('id', $id);

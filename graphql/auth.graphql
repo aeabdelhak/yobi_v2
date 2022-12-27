@@ -1,0 +1,54 @@
+type User {
+    id: ID!
+    name: String!
+    email: String!
+    active: Int!
+    role: Int!
+    avatar: File
+    abilities: [Permission] @hasMany
+    stores:[Store] @hasMany
+}
+
+type Permission {
+    id: ID!
+    code: String!
+    description: String
+}
+
+extend type Query @guard {
+    users: [User!]! @field(resolver: "Authenticate@users") @admin
+    me: User @auth
+    initialise:Init @field(resolver: "Authenticate@initialise")
+    user(id: ID! @eq): User @find
+}
+
+extend type Query {
+    authenticate(email: String!, password: String!): AuthenticateResponse!
+        @field(resolver: "Authenticate@login")
+}
+
+extend type Mutation @guard {
+    newUser(name: String!, email: String!, permissions: [ID!]): newUserResponse
+        @field(resolver: "Authenticate@newAdmin")
+        @admin
+
+    deleteUser(id: ID!): Int!
+        @field(resolver: "Authenticate@deleteAdmin")
+        @admin
+
+    changeStatus(userId: ID!, status: Boolean): User!
+        @field(resolver: "Authenticate@deleteAdmin")
+        @admin
+
+    changePassword(
+        password: String!
+        new_password: String!
+        confirmation_password: String!
+    ): Int! @field(resolver: "Authenticate@changePassword")
+
+    changeName(new_name: String!): String
+        @field(resolver: "Authenticate@changeName")
+
+    changeAvatar(new_name: Upload!): String
+        @field(resolver: "Authenticate@uploadAvatar")
+}
