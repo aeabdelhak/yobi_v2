@@ -3,7 +3,7 @@ scalar Upload
 scalar DateTime
   @scalar(class: "Nuwave\\Lighthouse\\Schema\\Types\\Scalars\\DateTime")
   
-type File {
+type file {
     id: ID!
     name: String!
     path: String!
@@ -12,20 +12,20 @@ type File {
 }
 
 
-type Size {
+type size {
     id: ID!
     label: String!
     status: Int!
 }
 
-type Detail {
+type detail {
     id: ID!
     amount: Int
     price: Float!
-    color: Color
-    size: Size
-    offer: Offer
-    shape: Shape
+    color: color
+    size: size
+    offer: offer
+    shape: shape
 }
 
 #import response.graphql

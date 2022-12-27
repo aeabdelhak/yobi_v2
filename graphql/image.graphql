@@ -1,12 +1,12 @@
-type Image {
+type image {
     id: ID!
-    file: File
-    landing: LandingPage
+    file: file
+    landing: landingPage
 }
 
 extend type Mutation @guard {
-    deleteImage(id: ID!): Image @delete
+    deleteImage(id: ID!): image @delete
 }
 extend type Query @guard {
-    image(id: ID! @eq): Image! @find
+    image(id: ID! @eq): image! @find
 }

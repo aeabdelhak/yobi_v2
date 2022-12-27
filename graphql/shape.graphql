@@ -5,15 +5,15 @@ input ShapeConstrunct {
     promotioned_price: Float
     id_landing_page: ID!
 }
-type Shape {
+type shape {
     id: ID!
     name: String!
     description: String
     original_price: Float!
     promotioned_price: Float
     status: Int!
-    landing: LandingPage! @belongsTo
-    colors: [Color] @hasMany
+    landing: landingPage! @belongsTo
+    colors: [color] @hasMany
 }
 
 type ShapeForClient @model(class: "shape") {
@@ -23,22 +23,22 @@ type ShapeForClient @model(class: "shape") {
     original_price: Float!
     promotioned_price: Float
     status: Int!
-    colors: [Color] @hasMany
-    activatedColors: [Color] @hasMany
+    colors: [color] @hasMany
+    activatedColors: [color] @hasMany
 }
 
 extend type Mutation @guard {
-    newShape(model: ShapeConstrunct @spread): Shape! @create
-    deleteSahpe(id: ID!): Shape @delete
-    shape(id: ID!): Shape @find
+    newShape(model: ShapeConstrunct @spread): shape! @create
+    deleteSahpe(id: ID!): shape @delete
+    shape(id: ID!): shape @find
     editShape(
         id: ID!
         name: String
         original_price: Float
         promotioned_price: Float
         status: Int
-    ): Shape @update
+    ): shape @update
 }
 extend type Query @guard {
-    shape(id: ID! @eq): Shape @find
+    shape(id: ID! @eq): shape @find
 }

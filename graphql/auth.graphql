@@ -4,12 +4,12 @@ type User {
     email: String!
     active: Int!
     role: Int!
-    avatar: File
-    abilities: [Permission] @hasMany
-    stores:[Store] @hasMany
+    avatar: file
+    abilities: [permission] @hasMany
+    stores:[store] @hasMany
 }
 
-type Permission {
+type permission {
     id: ID!
     code: String!
     description: String

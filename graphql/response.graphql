@@ -1,7 +1,7 @@
 type AuthenticateResponse {
     token: String
     user: User
-    stores:[Store]
+    stores:[store]
     status: Int!
 }
 type ChoseStoreResponse {
@@ -16,5 +16,5 @@ type newUserResponse {
 
 type Init {
     user: User
-    store: Store
+    store: store
 }
