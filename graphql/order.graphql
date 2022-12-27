@@ -36,7 +36,7 @@ extend type Query  {
              @field(resolver: "OrdersQueries@orders")
 
 
-    order(id: ID! @eq, id_store: ID! @eq): Order @first
+    order(id: ID! @eq, id_store: ID! @eq): order @first
 
 
     ordersStatistics(id_store: ID!): [OrdersStatistics]

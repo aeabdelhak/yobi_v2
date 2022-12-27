@@ -8,7 +8,7 @@ type landingPage {
     status: Int!
     store: store!
     pallete: pallete!
-    audios: [Audio] @hasMany
+    audios: [audio] @hasMany
     poster: file
     shapes: [shape] @hasMany
     offers: [offer] @hasMany
