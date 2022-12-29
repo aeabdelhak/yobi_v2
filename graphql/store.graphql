@@ -30,6 +30,7 @@ type StoreForClient {
 
 extend type Query  {
     getStore(id: ID! @eq): store @find
+    
 }
 extend type Query @guard  {
     stores: [store] @all

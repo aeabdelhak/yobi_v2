@@ -5,7 +5,10 @@ type image {
 }
 
 extend type Mutation @guard {
-    deleteImage(id: ID!): image @delete
+    newImage(id_landing_page: ID!, image: Upload!): image
+        @field(resolver: "ImageMutator@newImage")
+        @can(ability: "manage_landing_pages")
+    deleteImage(id: ID!): Boolean @field(resolver: "ImageMutator@delete")
 }
 extend type Query @guard {
     image(id: ID! @eq): image! @find

@@ -4,9 +4,9 @@ namespace App\GraphQL\Directives;
 
 use Nuwave\Lighthouse\Schema\Directives\BaseDirective;
 use Nuwave\Lighthouse\Support\Contracts\ArgDirectiveForArray;
-use Nuwave\Lighthouse\Support\Contracts\ArgTransformerDirective;
+use Nuwave\Lighthouse\Support\Contracts\ArgResolver;
 
-final class PermissionDirective extends BaseDirective implements ArgDirectiveForArray, ArgTransformerDirective
+final class PermissionDirective extends BaseDirective implements ArgDirectiveForArray, ArgResolver
 {
     // TODO implement the directive https://lighthouse-php.com/master/custom-directives/getting-started.html
 
@@ -18,13 +18,12 @@ GRAPHQL;
     }
 
     /**
-     * Apply transformations on the value of an argument given to a field.
-     *
-     * @param  mixed  $argumentValue
+     * @param  mixed  $root  The result of the parent resolver.
+     * @param  mixed|\Nuwave\Lighthouse\Execution\Arguments\ArgumentSet|array<\Nuwave\Lighthouse\Execution\Arguments\ArgumentSet>  $value  The slice of arguments that belongs to this nested resolver.
      * @return mixed
      */
-    public function transform($argumentValue)
+    public function __invoke($root, $value)
     {
-        // TODO implement the arg transformer
+        // TODO implement the arg resolver
     }
 }

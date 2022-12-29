@@ -28,6 +28,10 @@ class userResult extends Model
     {
         return $this->hasOne(file::class,'id','id_image');
     }
+    public function image()
+    {
+        return $this->hasOne(file::class,'id','id_image');
+    }
     public function landing()
     {
         return $this->hasOne(landingPage::class,'id','id_landing_page');

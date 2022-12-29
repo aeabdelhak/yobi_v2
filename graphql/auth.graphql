@@ -16,7 +16,7 @@ type permission {
 }
 
 extend type Query @guard {
-    users: [User!]! @field(resolver: "Authenticate@users") @admin
+    users: [User!]! @field(resolver: "Authenticate@users") @can(ability:"admin")
     me: User @auth
     initialise:Init @field(resolver: "Authenticate@initialise")
     user(id: ID! @eq): User @find
@@ -30,15 +30,15 @@ extend type Query {
 extend type Mutation @guard {
     newUser(name: String!, email: String!, permissions: [ID!]): newUserResponse
         @field(resolver: "Authenticate@newAdmin")
-        @admin
+        @can(ability:"admin")
 
     deleteUser(id: ID!): Int!
         @field(resolver: "Authenticate@deleteAdmin")
-        @admin
+        @can(ability:"admin")
 
     changeStatus(userId: ID!, status: Boolean): User!
         @field(resolver: "Authenticate@deleteAdmin")
-        @admin
+        @can(ability:"admin")
 
     changePassword(
         password: String!

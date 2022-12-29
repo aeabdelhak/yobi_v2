@@ -1,11 +1,27 @@
-
 type card {
-        id:ID!
-        title:String!
-        status:Int!
-        body:String
-        landing:landingPage @belongsTo
+    id: ID!
+    title: String!
+    status: Int!
+    body: String
+    landing: landingPage @belongsTo
 }
 extend type Query @guard {
-    card(id: ID! @eq): card @find
+    card(id: ID! @eq): card @can(ability: "manage_landing_pages") @find
+}
+extend type Mutation @guard {
+    newCard(model: cardInput! @spread): card!
+        @create
+        @can(ability: "manage_landing_pages")
+
+    deleteCard(id: ID! @eq): card @delete @can(ability: "manage_landing_pages")
+
+    editCard(id: ID!, title: String!, body: String!): card
+        @update
+        @can(ability: "manage_landing_pages")
+
+}
+input cardInput {
+    title: String!
+    body: String!
+    id_landing_page: ID!
 }

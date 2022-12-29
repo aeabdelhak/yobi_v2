@@ -12,11 +12,6 @@ type file {
 }
 
 
-type size {
-    id: ID!
-    label: String!
-    status: Int!
-}
 
 type detail {
     id: ID!
@@ -42,3 +37,4 @@ type detail {
 #import result.graphql
 #import orderChange.graphql
 #import card.graphql
+#import size.graphql

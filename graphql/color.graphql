@@ -5,6 +5,26 @@ type color {
     status: Int!
     color_code: String!
     image: file
-    size: [size]
-    offers: [offer]
+    sizes: [size] @hasMany
+    shape: shape @belongsTo
+    offers: [offer] @hasMany
+}
+extend type Query @guard {
+    color(id: ID! @eq): color 
+    @find
+    @can(ability: "manage_landing_pages") 
+}
+extend type Mutation @guard {
+        newColor(id_shape: ID!,name: String!,color_code:String!,image:Upload): color
+            @field(resolver: "colorMutator@newColor")
+            @can(ability: "manage_landing_pages")
+        editColor(id: ID!,name: String,color_code:String,image:Upload): color
+            @field(resolver: "colorMutator@editColor")
+            @can(ability: "manage_landing_pages")
+        toggleColor(id: ID!): color
+            @field(resolver: "colorMutator@toggleState")
+            @can(ability: "manage_landing_pages")
+        deleteColor(id: ID! @eq): color 
+            @delete
+           @can(ability: "manage_landing_pages")
 }

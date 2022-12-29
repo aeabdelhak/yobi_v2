@@ -18,6 +18,15 @@ type offer {
 extend type Mutation @guard {
     newOffer(input: OfferConstrunct @spread): offer! @create
     deleteOffer(id: ID!): offer @delete
+    editOffer(
+        id: ID!
+        label: String
+        original_price: Float
+        promotioned_price: Float
+    ): offer
+    @update
+    @can(ability:"manage_landing_pages")
+
 }
 extend type Query @guard {
     offer(id: ID! @eq): offer @find

@@ -7,9 +7,15 @@ type audio {
 extend type Mutation @guard {
     newAudio(audio: Upload!, owner: String!, id_landing_page: ID!): audio
         @field(resolver: "AudioMutator@newAudio")
+        @can(ability:"manage_landing_pages")
 
-    deleteAudio(id: ID!): Boolean @field(resolver: "AudioMutator@delete")
+    deleteAudio(id: ID!): Boolean 
+        @field(resolver: "AudioMutator@delete")
+        @can(ability:"manage_landing_pages")
 
-    changeAudioOwnerName(id: ID!, name: String!): Int!
+
+    changeAudioOwnerName(id: ID!, name: String!): audio!
         @field(resolver: "AudioMutator@changeOwnerName")
+        @can(ability:"manage_landing_pages")
+
 }

@@ -24,6 +24,8 @@ final class AudioMutator
         $audio->id_file = FilesController::store($args['audio']);
         $audio->id_landing_page = $args['id_landing_page'];
         if ($audio->save()) {
+            $audio->refresh();
+            $audio->file;
                 return $audio; 
         }
     }
@@ -33,7 +35,6 @@ final class AudioMutator
             return false;
         }
         $id_file = $audio->id_file;
-
         if ($audio->delete()) {
             return FilesController::delete($id_file);
         }
@@ -42,15 +43,15 @@ final class AudioMutator
 
     public function changeOwnerName($_, array $args)
     {
-        $audio = audio::whereID('id',$args['id'])->first();
+        $audio = audio::where('id',$args['id'])->first();
         if(!$audio){
-            return 0;
+            return null;
         }
 
         $audio->owner=$args['name'];
         $audio->save();
-        
-        return 1;
+        $audio->file;
+        return $audio;
 
 
     }

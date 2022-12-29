@@ -17,4 +17,9 @@ class audio extends Model
         'id_file',
         'id_landing_page',
     ];
+
+    public function file()
+    {
+        return $this->hasOne(file::class,'id','id_file');
+    }
 }

@@ -1,13 +1,31 @@
 type userResult {
     id: ID!
-    file: file
+    image: file
     landing: landingPage
 }
 
+
+
 extend type Mutation @guard {
-    deleteUserResult(id: ID!): userResult @delete
+    newUserResult(
+    id_landing_page: ID!
+         image: Upload!
+    ):userResult
+            @field(resolver: "UserResultMutator@newResult")
+            @can(ability:"manage_landing_pages")
+
+
+    deleteUserResult(id: ID!): userResult 
+        @delete
+        @can(ability:"manage_landing_pages")
+
 }
 extend type Query @guard {
-    userResult(id: ID! @eq): userResult! @find
-    usersResults: [userResult] @all
+    userResult(id: ID! @eq): userResult! 
+        @find
+        @can(ability:"manage_landing_pages")
+
+    usersResults: [userResult] 
+        @all
+        @can(ability:"manage_landing_pages")
 }

@@ -28,17 +28,25 @@ type ShapeForClient @model(class: "shape") {
 }
 
 extend type Mutation @guard {
-    newShape(model: ShapeConstrunct @spread): shape! @create
+    newShape(model: ShapeConstrunct @spread): shape! 
+        @create
+        @can(ability:"manage_landing_pages")
+
     deleteSahpe(id: ID!): shape @delete
-    shape(id: ID!): shape @find
     editShape(
         id: ID!
         name: String
+        description: String
         original_price: Float
         promotioned_price: Float
         status: Int
-    ): shape @update
+    ): shape
+    @update
+    @can(ability:"manage_landing_pages")
+
 }
 extend type Query @guard {
-    shape(id: ID! @eq): shape @find
+    shape(id: ID! @eq): shape 
+        @find
+        @can(ability:"manage_landing_pages")
 }

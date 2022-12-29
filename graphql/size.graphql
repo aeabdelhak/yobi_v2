@@ -1,0 +1,29 @@
+type size {
+    id: ID!
+    label: String!
+    status: Int!
+}
+
+extend type Query @guard {
+    size(id: ID! @eq): size 
+    @find
+    @can(ability: "manage_landing_pages") 
+}
+extend type Mutation @guard {
+        newSize(
+            id_shape: ID!
+            id_color: ID! label:String! ): size @create
+            @can(ability: "manage_landing_pages")
+
+        toggleSize(id: ID!): color
+            @field(resolver: "sizeMutator@toggleState")
+            @can(ability: "manage_landing_pages")
+        
+        editSize(id: ID!,label:String! @spread): size
+            @update
+            @can(ability: "manage_landing_pages")
+      
+        deleteSize(id: ID!): size
+            @delete
+            @can(ability: "manage_landing_pages")
+}
