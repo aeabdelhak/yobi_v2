@@ -16,7 +16,7 @@ extend type Mutation @guard {
             @can(ability: "manage_landing_pages")
 
         toggleSize(id: ID!): color
-            @field(resolver: "sizeMutator@toggleState")
+            @field(resolver: "SizeMutator@toggleState")
             @can(ability: "manage_landing_pages")
         
         editSize(id: ID!,label:String! @spread): size
