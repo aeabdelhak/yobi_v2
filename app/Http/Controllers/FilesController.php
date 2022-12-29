@@ -11,9 +11,10 @@ class FilesController extends Controller
     public static function store($file)
     {
 
-        $name = $file->getClientOriginalName() .'-' . time();
         $type = $file->getClientOriginalExtension();
-        $path = Storage::disk('cdn')->put($name, $file);
+        $fileName = pathinfo($file,PATHINFO_FILENAME).time();
+        $name = $fileName.$type;
+        $path = Storage::disk('cdn')->put($name,$file);
         $save = new file();
         $save->name = $name;
         $save->type = $type;
