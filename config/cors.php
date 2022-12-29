@@ -13,22 +13,12 @@ foreach (getallheaders() as $name => $value) {
 }
 
 return [
-
-
-    'paths' => ['api/*', 'graphql', 'sanctum/csrf-cookie'],
-
+    'paths' => ['api/*', 'graphql'],
     'allowed_methods' => ['*'],
-
-    'allowed_origins' => [$origin],
-
+    'allowed_origins' => ['*'],
     'allowed_origins_patterns' => [],
-
     'allowed_headers' => ['*'],
-
-    'exposed_headers' => [],
-
-    'max_age' => 2123123,
-
+    'exposed_headers' => false,
+    'max_age' => false,
     'supports_credentials' => false,
-
 ];
