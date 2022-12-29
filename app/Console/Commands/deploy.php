@@ -27,14 +27,12 @@ class deploy extends Command
      */
     public function handle()
     {
-        exec('
-        sudo chgrp -R www-data storage bootstrap/cache
-        sudo chmod -R ug+rwx storage bootstrap/cache
-        composer install --optimize-autoloader --no-dev
-        php artisan config:cache
-        php artisan route:cache
-        nginx -s reload
-        ');
+        exec('sudo chgrp -R www-data storage bootstrap/cache');
+        exec('sudo chmod -R ug+rwx storage bootstrap/cache');
+        exec('composer install --optimize-autoloader --no-dev');
+        exec('php artisan config:cache');
+        exec('php artisan route:cache');
+        exec('nginx -s reload');
         return Command::SUCCESS;
     }
 }
