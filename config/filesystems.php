@@ -35,6 +35,11 @@ return [
             'root' => storage_path('app'),
             'throw' => false,
         ],
+        'cdn' => [
+            'driver' => 'local',
+            'root' => '/var/www/files',
+            'throw' => false,
+        ],
 
         'public' => [
             'driver' => 'local',

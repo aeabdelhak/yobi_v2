@@ -11,16 +11,15 @@ class FilesController extends Controller
     public static function store($file)
     {
 
-        $name = $file->getClientOriginalName();
+        $name = $file->getClientOriginalName() .'-' . time();
         $type = $file->getClientOriginalExtension();
-
-        $path = $file->store('public/files');
+        $path = Storage::disk('cdn')->put($name, $file);
         $save = new file();
         $save->name = $name;
         $save->type = $type;
         $save->path = $path;
         $save->url = Storage::url($path);
-
+        
         $save->save();
         return $save->id;
 
@@ -34,13 +33,13 @@ class FilesController extends Controller
 
         $path = $file->path;
 
-        $exist = Storage::exists($path);
+        $exist = Storage::disk('cdn')->exists($path);
         if (!$exist) {
             return false;
         }
 
         if ($file->delete()) {
-            Storage::delete($path);
+            Storage::disk('cdn')->delete($path);
             return true;
         }
 
