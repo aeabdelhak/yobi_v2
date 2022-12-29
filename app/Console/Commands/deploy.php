@@ -32,7 +32,9 @@ class deploy extends Command
         sudo chmod -R ug+rwx storage bootstrap/cache
         composer install --optimize-autoloader --no-dev
         php artisan config:cache
-        php artisan route:cache');
+        php artisan route:cache
+        nginx -s reload
+        ');
         return Command::SUCCESS;
     }
 }
