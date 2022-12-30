@@ -49,6 +49,7 @@ extend type Mutation @guard {
     changeColorOfferImgae(id:ID!,image:Upload!) :file
     @field(resolver:"ColorOfferMutator@changeImage")
     @can(ability:"manage_landing_pages")
+    
     assignOfferToColor(id_color:ID!,id_offer:ID!,image:Upload!) :colorOffer
     @field(resolver:"ColorOfferMutator@assign")
     @can(ability:"manage_landing_pages")
