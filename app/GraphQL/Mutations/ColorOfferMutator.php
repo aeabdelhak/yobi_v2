@@ -41,6 +41,7 @@ final class ColorOfferMutator
         $hasOffer->id_color=$args['id_color'];
         $hasOffer->id_offer=$args['id_offer'];
         $hasOffer->refresh();
+        $hasOffer->id;
         $hasOffer->image;
         $hasOffer->offer;
         return $hasOffer;
