@@ -28,6 +28,7 @@ class deploy extends Command
     public function handle()
     {
         if(env('APP_ENV')=='production'){
+                exec('git pull');
                 exec('sudo chgrp -R www-data storage bootstrap/cache');
                 exec('sudo chmod -R ug+rwx storage bootstrap/cache'); 
         }
