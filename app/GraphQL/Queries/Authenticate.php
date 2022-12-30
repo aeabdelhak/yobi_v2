@@ -39,7 +39,7 @@ final class Authenticate
             $response->user = Auth::user();
 
             if ((count($stores) == 0 || count($stores) == 1) && $user->isAdmin()) {
-                Auth::factory()->setTTL(60);
+                Auth::factory()->setTTL(60*6);
                 $token = Auth::fromUser($user);
             }
         }

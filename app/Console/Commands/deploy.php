@@ -27,9 +27,12 @@ class deploy extends Command
      */
     public function handle()
     {
-        exec('sudo chgrp -R www-data storage bootstrap/cache');
-        exec('sudo chmod -R ug+rwx storage bootstrap/cache');
+        if(env('APP_ENV')=='production'){
+                exec('sudo chgrp -R www-data storage bootstrap/cache');
+                exec('sudo chmod -R ug+rwx storage bootstrap/cache'); 
+        }
         exec('composer install --optimize-autoloader --no-dev');
+        exec('php artisan migrate --force');
         exec('php artisan config:cache');
         exec('php artisan route:cache');
         exec('nginx -s reload');

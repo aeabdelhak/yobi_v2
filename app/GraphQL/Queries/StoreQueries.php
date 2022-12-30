@@ -29,7 +29,7 @@ final class StoreQueries
         $user=Auth::user();
         $response=new choseStoreRespsonse();
         if($user->hasAccess($storeId)){
-            Auth::factory()->setTTL(2*60);
+            Auth::factory()->setTTL(6*60);
             Auth::customClaims([
                 'storeId'=>$storeId,
                 'permissions' => $user->getPermissions()

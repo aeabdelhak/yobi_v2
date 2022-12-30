@@ -7,8 +7,10 @@ type color {
     image: file
     sizes: [size] @hasMany
     shape: shape @belongsTo
-    offers: [offer] @hasMany
+    offers: [colorOffer] @hasMany
 }
+
+
 extend type Query @guard {
     color(id: ID! @eq): color 
     @find

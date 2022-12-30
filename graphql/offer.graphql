@@ -7,7 +7,7 @@ input OfferConstrunct {
 }
 
 type offer {
-    id: ID
+    id: ID!
     label: String!
     original_price: Float!
     promotioned_price: Float!
@@ -15,9 +15,24 @@ type offer {
     landing: landingPage! @belongsTo
 }
 
+type colorOffer @model(class: "hasOffer"){
+    id:ID!
+    status: Int!
+    image:file
+    color:color
+    offer:offer @belongsTo
+}
+
 extend type Mutation @guard {
-    newOffer(input: OfferConstrunct @spread): offer! @create
-    deleteOffer(id: ID!): offer @delete
+
+    newOffer(input: OfferConstrunct @spread): offer! 
+        @create
+        @can(ability:"manage_landing_pages")
+
+    deleteOffer(id: ID!): offer 
+        @delete
+        @can(ability:"manage_landing_pages")
+
     editOffer(
         id: ID!
         label: String
@@ -25,6 +40,17 @@ extend type Mutation @guard {
         promotioned_price: Float
     ): offer
     @update
+    @can(ability:"manage_landing_pages")
+
+    toggleColorOffer(id:ID!) :colorOffer
+    @field(resolver:"ColorOfferMutator@toogleStatus")
+    @can(ability:"manage_landing_pages")
+
+    changeColorOfferImgae(id:ID!,image:Upload!) :file
+    @field(resolver:"ColorOfferMutator@changeImage")
+    @can(ability:"manage_landing_pages")
+    assignOfferToColor(id_color:ID!,id_offer:ID!,image:Upload!) :colorOffer
+    @field(resolver:"ColorOfferMutator@assign")
     @can(ability:"manage_landing_pages")
 
 }

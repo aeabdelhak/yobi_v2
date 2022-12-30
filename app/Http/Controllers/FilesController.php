@@ -11,9 +11,8 @@ class FilesController extends Controller
     public static function store($file)
     {
 
+        $name = $file->getClientOriginalName();
         $type = $file->getClientOriginalExtension();
-        $fileName = pathinfo($file,PATHINFO_FILENAME).time();
-        $name = $fileName.$type;
         $path = Storage::disk('cdn')->put('',$file);
         $save = new file();
         $save->name = $name;

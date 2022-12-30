@@ -26,4 +26,17 @@ class hasOffer extends Model
         return $query->where('id', $id);
     }
 
+    public function image()
+    {
+        return  $this->hasOne(file::class, 'id','id_image');
+    }
+    public function color()
+    {
+        return  $this->hasOne(color::class, 'id','id_color');
+    }
+    public function offer()
+    {
+        return  $this->hasOne(offer::class, 'id','id_offer');
+    }
+
 }

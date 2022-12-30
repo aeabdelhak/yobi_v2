@@ -34,7 +34,7 @@ class color extends Model
     }
     public function offers()
     {
-        return   $this->hasManyThrough(offer::class,hasOffer::class, 'id_offer','id','id','id_color');
+        return   $this->hasMany(hasOffer::class, 'id_color');
     }
 
 
