@@ -8,12 +8,20 @@ use Illuminate\Support\Facades\Storage;
 
 class FilesController extends Controller
 {
+
+ 
+
+   private static function disc()
+   {
+    return env('APP_DRIVER') ;  
+   }
+
     public static function store($file)
     {
-
+        $disc=FilesController::disc();
         $name = $file->getClientOriginalName();
         $type = $file->getClientOriginalExtension();
-        $path = Storage::disk('cdn')->put('',$file);
+        $path = Storage::disk($disc)->put('',$file);
         $save = new file();
         $save->name = $name;
         $save->type = $type;
@@ -32,14 +40,14 @@ class FilesController extends Controller
         }
 
         $path = $file->path;
-
-        $exist = Storage::disk('cdn')->exists($path);
+        $disc=FilesController::disc();
+        $exist = Storage::disk($disc)->exists($path);
         if (!$exist) {
             return false;
         }
 
         if ($file->delete()) {
-            Storage::disk('cdn')->delete($path);
+            Storage::disk($disc)->delete($path);
             return true;
         }
 

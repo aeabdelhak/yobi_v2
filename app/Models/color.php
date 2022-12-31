@@ -3,9 +3,11 @@
 namespace App\Models;
 
 use App\Enums\sharedStatus;
+use App\Policies\colorPolicy;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use PHPOpenSourceSaver\JWTAuth\Facades\JWTAuth;
 
 class color extends Model
 {
@@ -20,6 +22,26 @@ class color extends Model
         'id_image',
 
     ];
+    public static function boot() {
+        parent::boot();
+        static::deleting(function($card) {
+            if(!(new colorPolicy)->delete(JWTAuth::user(),$card))
+                return abort(404);
+        });
+        static::creating(function($card) {
+            if(!(new colorPolicy)->create(JWTAuth::user(),$card))
+                return abort(404);
+        });
+        static::updating(function($card) {
+            if(!(new colorPolicy)->update(JWTAuth::user(),$card))
+                return abort(404);
+        });
+
+
+    }
+
+
+
     public function shape()
     {
         return  $this->belongsTo(shape::class, 'id_shape');

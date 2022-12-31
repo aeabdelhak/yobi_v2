@@ -22,6 +22,10 @@ class Authenticate extends BaseMiddleware
         try {
             $user = JWTAuth::parseToken()->authenticate();
             if ($user && in_array($user->status, [userStatus::$active, userStatus::$superAdmin])) {
+                if($user->store()){
+                   if(! $user->hasAccess($user->store()))
+                   return response()->json(['status' => 'invalid token'], 403);
+                }
                 return $next($request);
             } else {
                 return response()->json(['status' => 'invalid token'], 403);

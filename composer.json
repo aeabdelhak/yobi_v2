@@ -43,7 +43,8 @@
         "files": [
             "app/helpers/res.php",
             "app/helpers/curl.php",
-            "app/helpers/statusToString.php"
+            "app/helpers/statusToString.php",
+            "app/helpers/array_key_exist_or.php"
         ]
     },
     "autoload-dev": {

@@ -22,9 +22,9 @@ class offer extends Model
 
     public static function boot() {
         parent::boot();
-
         static::deleting(function($offer) { // before delete() method call this
-             $offer->hasOffers()->delete();
+            
+            $offer->hasOffers()->delete();
              // do the rest of the cleanup...
         });
     }

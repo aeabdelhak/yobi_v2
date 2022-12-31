@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
-use Illuminate\Notifications\Notifiable;
+use PHPOpenSourceSaver\JWTAuth\Facades\JWTAuth as Auth;
 use Laravel\Sanctum\HasApiTokens;
 use PHPOpenSourceSaver\JWTAuth\Contracts\JWTSubject;
 
@@ -134,6 +134,12 @@ class User extends Authenticatable implements JWTSubject
     public function stores()
     {
         return   $this->hasManyThrough(store::class,storeAccess::class, 'id_store','id','id','id_user');
+    }
+    public static function store()
+    {
+        $payload = Auth::parseToken()->getPayload();
+        $storeId=$payload->get('storeId');
+        return store::find($storeId);
     }
 
 

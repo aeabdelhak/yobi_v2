@@ -12,8 +12,10 @@ type store {
     google: String
     icon: file
     orders: [order]! @paginate
-    landings: [landingPage]
+    landings: [landingPage] @hasMany
+    users: [User] @hasMany
 }
+
 
 type StoreForClient {
     id: ID!
@@ -28,13 +30,27 @@ type StoreForClient {
     landings: [landingPage]
 }
 
-extend type Query  {
+extend type Query {
     getStore(id: ID! @eq): store @find
-    
 }
-extend type Query @guard  {
+extend type Query @guard {
     stores: [store] @all
-       choseStore(storeId: ID!): ChoseStoreResponse!
+    choseStore(storeId: ID!): ChoseStoreResponse!
         @field(resolver: "StoreQueries@choseStore")
 }
+extend type Mutation @guard {
+    changeStoreIcon(image: Upload!): file
+        @field(resolver: "StoreMutator@changeIcon")
+        updateStore( 
+                    name: String!
+                    description: String
+                    token: String!
+                    secret_token: String!
+                    fecebook_meta_tag: String
+                    facebook: String
+                    tiktok: String
+                    google: String
+                    ): store         
+        @field(resolver: "StoreMutator@update")
 
+}

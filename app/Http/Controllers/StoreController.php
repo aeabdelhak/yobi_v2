@@ -42,7 +42,6 @@ class StoreController extends Controller
         if ($id) {
             return response($this->get($id));
         }
-
     }
 
     public function only(Request $req)

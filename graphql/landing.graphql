@@ -41,5 +41,7 @@ extend type Query {
 
 extend type Query  @guard{
     landingsPages(id_store: ID! @eq): [landingPage] @all
-    landingPage(id: ID! @eq): landingPage @first
+    landingPage(id: ID! @eq): landingPage 
+    @can(ability: "view", resolved: true)
+    @first
 }
