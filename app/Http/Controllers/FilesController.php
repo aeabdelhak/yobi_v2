@@ -13,7 +13,7 @@ class FilesController extends Controller
 
    private static function disc()
    {
-    return env('APP_DRIVER') ;  
+    return 'cdn' ;  
    }
 
     public static function store($file)
