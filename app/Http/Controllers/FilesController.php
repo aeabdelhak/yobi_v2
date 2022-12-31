@@ -18,10 +18,9 @@ class FilesController extends Controller
 
     public static function store($file)
     {
-        $disc=FilesController::disc();
         $name = $file->getClientOriginalName();
         $type = $file->getClientOriginalExtension();
-        $path = Storage::disk($disc)->put('',$file);
+        $path = Storage::store($file);
         $save = new file();
         $save->name = $name;
         $save->type = $type;
@@ -40,14 +39,13 @@ class FilesController extends Controller
         }
 
         $path = $file->path;
-        $disc=FilesController::disc();
-        $exist = Storage::disk($disc)->exists($path);
+        $exist = Storage::exists($path);
         if (!$exist) {
             return false;
         }
 
         if ($file->delete()) {
-            Storage::disk($disc)->delete($path);
+            Storage::delete($path);
             return true;
         }
 
