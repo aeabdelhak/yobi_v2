@@ -15,4 +15,8 @@ class permission extends Model
         'description',
     ];
 
+    static function getId($code){
+        return permission::where('code',$code)->value('id');
+    }
+
 }

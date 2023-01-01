@@ -15,10 +15,10 @@ use Illuminate\Support\Facades\DB;
 class tawsilixController extends Controller
 {
 
-    public function cities()
+    public static function cities()
     {
         $path = '/cities.php';
-        return $this->callapi($path);
+        return  (object)  curl('GET', 'https://tawsilex.ma' . $path);
 
     }
 
@@ -123,7 +123,7 @@ class tawsilixController extends Controller
 
     }
 
-    private function callapi($path, $params = null)
+    private static function  callapi($path, $params = null)
     {
 
         return json_decode(curl('GET', 'https://tawsilex.ma' . $path), $params);

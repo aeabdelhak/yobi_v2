@@ -9,7 +9,6 @@ use App\Enums\userRoles;
 use App\Models\hasPermission;
 use App\Models\permission;
 use App\Models\User;
-use App\Types\newUserResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth as theAuth;
 use Illuminate\Support\Facades\DB;
@@ -22,12 +21,12 @@ class AuthController extends Controller
 
  
 
-    public function register($email, $name, $permissions)
+    public function register($email, $name, $password)
     {
 
         $user = User::withTrashed()->where('email', $email)->first();
 
-        $response = new newUserResponse();
+        $response = new \App\Types\newUserResponse();
 
         $sendMail = true;
 
@@ -37,25 +36,14 @@ class AuthController extends Controller
 
         }
 
-        $random = str_shuffle('abcdefghjklmnopqrstuvwxyzABCDEFGHJKLMNOPQRSTUVWXYZ234567890!$%^&!$%^&');
-        $password = substr($random, 0, 10);
 
         if ($user->trashed()) {
             $user->name = $name;
+            $user->role = userRoles::$user;
             $user->status = sharedStatus::$active;
             $user->password = Hash::make($password);
             $user->save();
             $user->restore();
-            $permissions = permission::whereIn('code', $permissions)->pluck('id');
-            hasPermission::where('id_user', $user->id)->delete();
-
-            if ($permissions->count() != 0) {
-                $insert = [];
-                foreach ($permissions as $key => $permission) {
-                    $insert[] = ['id_user' => $user->id, 'id_permission' => $permission, 'created_at' => now(), 'updated_at' => now()];
-                }
-                DB::table('has_permissions')->insert($insert);
-            }
 
             $response->status = newUserRes::$restored;
             $response->user = $user->refresh();
@@ -72,18 +60,74 @@ class AuthController extends Controller
                 'email' => $email,
                 'password' => Hash::make($password),
             ]);
-
-            $permissions = permission::whereIn('code', $permissions)->pluck('id');
-
-            if ($permissions->count() != 0) {
-                $insert = [];
-                foreach ($permissions as $key => $permission) {
-                    $insert[] = ['id_user' => $user->id, 'id_permission' => $permission, 'created_at' => now(), 'updated_at' => now()];
-                }
-                DB::table('has_permissions')->insert($insert);
-            }
             $response->status = newUserRes::$success;
             $response->user = $user->refresh();
+        }
+        if ($sendMail) {
+            (new SendEmailController())->welcome($email, $password);
+        }
+        return $response;
+
+    }
+    public function newStaff($email, $name, $permissions)
+    {
+
+        $user = User::withTrashed()->where('email', $email)->first();
+
+        $response = new \App\Types\newUserResponse();
+
+        $sendMail = true;
+
+        if ($user) {
+            $response->status = newUserRes::$exist;
+        }
+
+        $random = str_shuffle('abcdefghjklmnopqrstuvwxyzABCDEFGHJKLMNOPQRSTUVWXYZ234567890!$%^&!$%^&');
+        $password = substr($random, 0, 10);
+
+        if ($user->trashed()) {
+            $user->name = $name;
+            $user->status = sharedStatus::$active;
+            $user->password = Hash::make($password);
+            $user->save();
+            $user->restore();
+
+            hasPermission::where('id_user', $user->id)->delete();
+            $this->addPermissions($user->id,$permissions);
+
+            $response->status = newUserRes::$restored;
+            $user=$user->refresh();
+            $user->avatar;
+            $response->user = $user;
+
+        } else if ($user) {
+            if($user->role==userRoles::$user){
+                hasPermission::where('id_user', $user->id)->delete();
+                $user->role=userRoles::$admin;
+                $this->addPermissions($user->id,$permissions);
+                $user->save();
+                $user=$user->refresh();
+                $user->avatar;
+                $response->user = $user;
+                $response->status = newUserRes::$success;   
+            }
+            else 
+            {
+                    $response->status = newUserRes::$exist;
+                    $sendMail = false;
+            }
+        } else {
+
+            $user = User::create([
+                'name' => $name,
+                'email' => $email,
+                'password' => Hash::make($password),
+            ]);
+            $this->addPermissions($user->id,$permissions);
+            $response->status = newUserRes::$success;
+            $user=$user->refresh();
+            $user->avatar;
+            $response->user = $user;
         }
         if ($sendMail) {
             (new SendEmailController())->welcome($email, $password);
@@ -121,6 +165,19 @@ class AuthController extends Controller
 
         })->get(DB::raw('users.id id, url ,users.name name, email'));
 
+    }
+
+    public function addPermissions($userid,$permissions)
+    {
+        $permissions = permission::whereIn('code', $permissions)->pluck('id');
+
+        if ($permissions->count() != 0) {
+            $insert = [];
+            foreach ($permissions as $key => $permission) {
+                $insert[] = ['id_user' => $userid, 'id_permission' => $permission, 'created_at' => now(), 'updated_at' => now()];
+            }
+            DB::table('has_permissions')->insert($insert);
+        }
     }
 
 }

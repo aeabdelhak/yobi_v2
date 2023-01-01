@@ -20,7 +20,7 @@ class FilesController extends Controller
     {
         $name = $file->getClientOriginalName();
         $type = $file->getClientOriginalExtension();
-        $path = Storage::store($file);
+        $path = $file->store('public/files');
         $save = new file();
         $save->name = $name;
         $save->type = $type;

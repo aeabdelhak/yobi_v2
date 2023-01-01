@@ -16,29 +16,37 @@ type permission {
 }
 
 extend type Query @guard {
-    users: [User!]! @field(resolver: "Authenticate@users") @can(ability:"admin")
+    users(role:Int @eq active:Int @eq): [User!] @paginate  @admin
     me: User @auth
     initialise:Init @field(resolver: "Authenticate@initialise")
-    user(id: ID! @eq): User @find
 }
 
 extend type Query {
+    user(id: ID! @eq): User @find
+
     authenticate(email: String!, password: String!): AuthenticateResponse!
         @field(resolver: "Authenticate@login")
 }
 
 extend type Mutation @guard {
-    newUser(name: String!, email: String!, permissions: [ID!]): newUserResponse
+    newUser(name: String!, email: String!,password:String!): newUserResponse
         @field(resolver: "Authenticate@newAdmin")
-        @can(ability:"admin")
+  
+    newStaff(name: String!, email: String!, permissions: [Int!]): newUserResponse
+        @field(resolver: "Authenticate@newStaff")
+        @admin
 
-    deleteUser(id: ID!): Int!
+    deleteStaff(id: ID!): Boolean!
         @field(resolver: "Authenticate@deleteAdmin")
-        @can(ability:"admin")
+        @admin
 
-    changeStatus(userId: ID!, status: Boolean): User!
-        @field(resolver: "Authenticate@deleteAdmin")
-        @can(ability:"admin")
+    toggleUserStatus(id: ID!): User!
+        @field(resolver: "Authenticate@toggleStatus")
+        @admin
+
+    togglePermission(id: ID!,code:String!): Boolean!
+        @field(resolver: "Authenticate@togglePermission")
+        @admin
 
     changePassword(
         password: String!
@@ -49,6 +57,6 @@ extend type Mutation @guard {
     changeName(new_name: String!): String
         @field(resolver: "Authenticate@changeName")
 
-    changeAvatar(new_name: Upload!): String
+    changeAvatar(image: Upload!): file
         @field(resolver: "Authenticate@uploadAvatar")
 }

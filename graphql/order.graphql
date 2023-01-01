@@ -11,6 +11,10 @@ type order {
     landing: landingPage!
     details: [detail] @hasMany
 }
+type city {
+    Id: ID
+    City: String
+}
 
 type OrdersStatistics {
     status: Int
@@ -34,6 +38,8 @@ extend type Query  {
         search:String,
     ): Orders!    
              @field(resolver: "OrdersQueries@orders")
+
+    cities: [city] @field(resolver: "TawsilexQueries@getCities")
 
 
     order(id: ID! @eq, id_store: ID! @eq): order @first

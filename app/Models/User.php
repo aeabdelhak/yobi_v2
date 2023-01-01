@@ -102,7 +102,7 @@ class User extends Authenticatable implements JWTSubject
     }
     public function abilities()
     {
-        return $this->hasManyThrough(permission::class, hasPermission::class, 'id_permission', 'id', 'id', 'id_user');
+        return $this->hasManyThrough(permission::class, hasPermission::class, 'id_user', 'id', 'id', 'id_permission');
     }
 
     public static function getAccess($id)
