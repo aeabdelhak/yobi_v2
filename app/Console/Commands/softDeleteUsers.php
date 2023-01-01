@@ -29,7 +29,7 @@ class softDeleteUsers extends Command
      */
     public function handle()
     {
-       User::where('status',userStatus::$deleted)->delete();
+       User::where('active',userStatus::$deleted)->delete();
 
         return Command::SUCCESS;
     }
