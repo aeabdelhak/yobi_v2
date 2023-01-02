@@ -18,7 +18,7 @@ module.exports = {
       ref: 'origin/preprod',
       repo : 'git@github.com:aeabdelhak/yobi_v2.git',
       path : '/var/www/preprod/graphql',
-      'post-deploy' : 'sh /usr/bin/laravel_next.sh',
+      'post-deploy' : 'sh /usr/bin/dpl_laravel.sh',
     }
   }
 };
