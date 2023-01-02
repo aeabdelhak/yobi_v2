@@ -24,7 +24,7 @@ class order extends Model
         'status_date',
         'paid',
         'total_paid',
-        'id_landing_page',
+        'id_store',
     ];
 
     public function details()
@@ -39,15 +39,13 @@ class order extends Model
     {
         $query->where('status', '!=', orderStatus::$deleted);
     }
-    public function store()
+    public function shipping()
     {
-        $landing = landingPage::whereId($this->id_landing_page)->first();
-        $store = store::whereId($landing->id_store)->value('id');
-        return $store;
+       return $this->hasOne(shippServices::class,'id_order');
     }
-    public function landing()
-    {
-        return $this->belongsTo(landingPage::class, 'id_landing_page', 'id');
+    public function store()
+    {  
+        return $this->belongsTo(store::class,'id_store');
     }
 
 }

@@ -12,6 +12,11 @@ use App\Models\order;
 use App\Models\shape;
 use App\Models\size;
 use App\Enums\orderStatus;
+use App\Http\Controllers\orderController;
+use App\Http\Controllers\tawsilixController;
+use App\Models\orderChange;
+use App\Models\shippServices;
+use App\Types\createResponse;
 use Illuminate\Support\Facades\Log;
 use Mockery\Undefined;
 
@@ -80,7 +85,6 @@ class orderOperations
         $order->city = $nOrder->city;
         $order->address = $nOrder->address;
         $order->phone = $nOrder->phone;
-        $order->id_landing_page = $nOrder->id_landing_page;
         $order->id_store = $nOrder->id_store;
         $order->save();
 
@@ -162,4 +166,86 @@ class orderOperations
             ];
         }
 
+
+        public static function changeStatus($id ,$status,$note=null,$date=null)
+        {
+    
+       
+            $order = order::find($id);
+            if (!$order) {
+                return res('fail', 'please inter a valid id');
+            }
+    
+            if (in_array($status, [orderStatus::$delayed, orderStatus::$callRequested])) {
+                if (!$date) {
+                    return 'params needed';
+                }
+    
+            } else {
+                $date = null;
+            }
+            $ship = shippServices::where('id_order', $id)->first();
+            if ($ship && $ship->status == sharedStatus::$active) {
+                $ship->status = sharedStatus::$disactivated;
+                $ship->save();
+            }
+            $order->status = $status;
+            $order->status_date = $date;
+            $order->save();
+            $orderChange = new orderChange();
+            $orderChange->id_order = $id;
+            $orderChange->to_date = $date;
+            $orderChange->status = $status;
+            $orderChange->note = $note;
+            $orderChange->save();
+    
+            return $order->fresh();
+    
+        }
+        public static function pushToDelivery($id,$note=null)
+        {
+            $response=new createResponse();
+
+            $order = order::find($id);
+            
+            if($order->shipping){
+                $response->status=2;
+                return $response;
+            }
+            
+      
+    
+            $order->status = OrderStatus::$pushedToDelivery;
+    
+            if ((new tawsilixController())->push(
+                $id,
+                $order->name,
+                $order->city,
+                $order->address,
+                $order->phone,
+                $id,
+                (new orderController())->getOrderName($id),
+                1,
+                $note,
+                0,
+                0,
+                $order->total_paid)) {
+                $order->save();
+                $orderChange = new orderChange();
+                $orderChange->id_order = $id;
+                $orderChange->status = OrderStatus::$pushedToDelivery;
+                $orderChange->note = $note;
+                $orderChange->save();
+                $response->status=1;
+
+                $order->refresh();
+                
+                $response->data=$order->shipping;
+                return $response;
+            }
+            $response->status=0;
+            return $response;
+
+    
+        }
 }

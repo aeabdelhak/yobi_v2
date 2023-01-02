@@ -55,10 +55,6 @@ class landingPage extends Model
     {
         return $this->hasMany(card::class, 'id_landing_page', 'id')->where('status', sharedStatus::$active);
     }
-    public function orders()
-    {
-        return $this->hasMany(order::class, 'id_landing_page', 'id')->where('status', '!=', orderStatus::$deleted);
-    }
     public function poster()
     {
         return $this->hasOne(file::class, 'id', 'id_poster');
@@ -84,10 +80,11 @@ class landingPage extends Model
 
     public static function hasManyShapes($id)
     {
-        $count = shape::Landing($id)->where('status', sharedStatus::$active)->count();
+        $count = landingPage::find($id)->shapes->count();
         if ($count > 1) {
             return true;
         }
         return false;
     }
+
 }

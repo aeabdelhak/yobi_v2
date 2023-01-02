@@ -21,6 +21,7 @@ type detail {
     size: size
     offer: offer
     shape: shape
+    landing: landingPage
 }
 
 #import response.graphql

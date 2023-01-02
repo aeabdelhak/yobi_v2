@@ -18,7 +18,7 @@ class tawsilixController extends Controller
     public static function cities()
     {
         $path = '/cities.php';
-        return  (object)  curl('GET', 'https://tawsilex.ma' . $path);
+        return  json_decode(curl('GET', 'https://tawsilex.ma/cities.php'),true); 
 
     }
 
@@ -88,11 +88,12 @@ class tawsilixController extends Controller
         int $openpackage,
         $price) {
 
-        $tokens = store::join('landing_pages', 'landing_pages.id_store', 'stores.id')->join('orders', 'orders.id_landing_page', 'landing_pages.id')->where('orders.id', $idOrder)->first(['token', 'secret_token']);
+        $order = order::find($idOrder);
+        $store=$order->store;
 
         $data = array(
-            'tk' => $tokens->token,
-            'sk' => $tokens->secret_token,
+            'tk' => $store->token,
+            'sk' => $store->secret_token,
             'fullname' => $fullName,
             'phone' => $phone,
             "city" => $city,

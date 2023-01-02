@@ -36,5 +36,22 @@ final class OrderMutator
       $order=  orderOperations::newOrder(json_decode(json_encode( $args['model'])));
         return $order;
     }
+    public function changeOrderStatus($rootValue, array $args, GraphQLContext $context, ResolveInfo $resolveInfo)
+    {
+
+       $note = array_key_exist_or('note',$args,null);
+       $date= array_key_exist_or('date',$args,null);
+      $order=  orderOperations::changeStatus($args['id'],$args['status'],$note,$date);
+      if($order=='params needed')
+        abort(400);  
+      return $order;
+    }
+    public function pushToTawsilix($rootValue, array $args, GraphQLContext $context, ResolveInfo $resolveInfo)
+    {
+
+       $note = array_key_exist_or('note',$args,null);
+      $order=  orderOperations::pushToDelivery($args['id'],$note);
+      return $order;
+    }
 
 }

@@ -15,4 +15,8 @@ class shippServices extends Model
         'status',
         'by',
     ];
+    public function order()
+    {
+        return $this->belongsTo(order::class,'id_order');
+    }
 }

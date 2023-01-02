@@ -17,6 +17,7 @@ class detail extends Model
         'id_color',
         'id_order',
         'id_offer',
+        'id_landing_page',
     ];
 
     public function order()
@@ -38,6 +39,10 @@ class detail extends Model
     public function shape()
     {
         return $this->hasOne(shape::class, 'id', 'id_shape');
+    }
+    public function landing()
+    {
+        return $this->belongsTo(landingPage::class, 'id_landing_page');
     }
 
 }

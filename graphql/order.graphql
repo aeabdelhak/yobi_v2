@@ -6,12 +6,13 @@ type order {
     address: String!
     status: String!
     status_date: String
+    store: store
+    shipping: shipping
     paid: Float!
     total_paid: Float
-    landing: landingPage!
     details: [detail] @hasMany
 }
-type city {
+type City {
     Id: ID
     City: String
 }
@@ -30,35 +31,36 @@ type orderChange {
     admin: User
 }
 
-extend type Query  {
-    orders(
-        first:Int!,
-        page:Int!,
-        status:[Int]
-        search:String,
-    ): Orders!    
-             @field(resolver: "OrdersQueries@orders")
+extend type Query {
+    orders(first: Int!, page: Int!, status: [Int], search: String): Orders!
+        @field(resolver: "OrdersQueries@orders")
 
-    cities: [city] @field(resolver: "TawsilexQueries@getCities")
-
+    cities: [City] @field(resolver: "TawsilexQueries@getCities")
 
     order(id: ID! @eq, id_store: ID! @eq): order @first
-
 
     ordersStatistics(id_store: ID!): [OrdersStatistics]
         @field(resolver: "OrdersQueries@statistics")
 
-
     orderHistory(id_order: ID! @eq): [orderChange]
         @orderBy(column: "created_at", direction: "DESC")
         @all
-
-
 }
 extend type Mutation @guard {
     deleteOrder(ids: [ID!]): Int! @field(resolver: "OrderMutator@delete")
     newOrder(model: newOrderInput): order
         @field(resolver: "OrderMutator@newOrder")
+
+    updateOrder(model: editOrderInput @spread): order @update
+    changeOrderStatus(
+        id: ID!
+        note: String
+        date: DateTime
+        status: Int
+    ): order @field(resolver: "OrderMutator@changeOrderStatus")
+
+    pushToDelivery(id: ID!, note: String): pushResponse
+        @field(resolver: "OrderMutator@pushToTawsilix")
 }
 
 input newOrderInput {
@@ -70,6 +72,15 @@ input newOrderInput {
     id_store: ID!
     details: [detailInput]!
 }
+
+input editOrderInput {
+    id: ID!
+    name: String
+    phone: String
+    city: String
+    address: String
+    total_paid: Float
+}
 input detailInput {
     id_shape: ID!
     id_color: ID!
@@ -79,10 +90,21 @@ input detailInput {
 }
 
 type Orders {
-   total: Int,
-   from: Int,
-   to:  Int,
-   page:  Int,
-   pages:  Int,
-   data:[order]
+    total: Int
+    from: Int
+    to: Int
+    page: Int
+    pages: Int
+    data: [order]
+}
+type shipping {
+    id: ID!
+    order: order!
+    id_shipping: ID!
+    status: Int!
+    by: String
+}
+type pushResponse{
+    status:Int
+    data:shipping
 }

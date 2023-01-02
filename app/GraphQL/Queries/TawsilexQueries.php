@@ -16,6 +16,7 @@ final class TawsilexQueries
     }
     public function getCities($_, array $args)
     {
-      return tawsilixController::cities() ;
+       return tawsilixController::cities();
+ 
     }
 }

@@ -65,7 +65,7 @@ class orderController extends Controller
             if ($detail->color && shape::hasManyColors($detail->id_shape)) {
                 $name .= ' . اللون: ' . $detail->color;
             }
-            if ($detail->size && color::hasManyColors($detail->color_id)) {
+            if ($detail->size && color::find($detail->color_id)->sizes->count()>0) {
                 $name .= ' . المقاس: ' . $detail->size;
             }
             if ($detail->offer) {
