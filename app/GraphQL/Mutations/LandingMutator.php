@@ -38,7 +38,7 @@ final class LandingMutator
             $contents=file_get_contents('/var/www/configs/landing.txt');
             $config= str_replace('domain_name',trim($fulldomain),$contents);
 
-            exec("echo `cat <<EOF >  $fulldomain
+            exec(" cd /etc/nginx/sites-available && echo `cat <<EOF >  $fulldomain
             $contents
             EOF `
             ");
