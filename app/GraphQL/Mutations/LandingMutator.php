@@ -55,10 +55,11 @@ final class LandingMutator
             symlink($file, $symbolikfile);
 
             try {
-                $genCrt="/usr/bin/certbot --nginx -d $fulldomain --force-renewal";
-                $process =Process::fromShellCommandline("echo `$genCrt` ");
-                $nginxRbt="/usr/sbin/nginx -s reload";
-                $process =Process::fromShellCommandline(" echo `$nginxRbt` ");
+
+                $genCrt = new Process(['certbot','',"--nginx -d $fulldomain --force-renewal"]); 
+                $nginxRbt = new Process(['nginx','',"-s reload"]); 
+                $genCrt->run();
+                $nginxRbt->run();
                 $status=1;
             } catch (ProcessFailedException $exception) {
                 $landingPage->forceDelete();
