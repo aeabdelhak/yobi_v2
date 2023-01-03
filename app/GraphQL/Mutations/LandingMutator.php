@@ -39,14 +39,16 @@ final class LandingMutator
             $contents=file_get_contents('/var/www/configs/landing.txt');
             $config= str_replace('domain_name',trim($fulldomain),$contents);
                 
-                if(!file_exists($file)){
+                if(file_exists($file)){
+                    exec("rm /etc/nginx/sites-available/$fulldomain");
+                    exec("rm /etc/nginx/sites-enabled/$fulldomain");
+                }
                     $new=fopen($file,'w');
                     fputs($new,$config);
                     fclose($new);
-            }
-                            
-/*             Storage::disk('nginx')->put($fulldomain, $config);
- */
+                    exec("sudo ln -s /etc/nginx/sites-available/$fulldomain /etc/nginx/sites-enabled/$fulldomain");
+                    exec("nginx -s reload");
+
         }
         return $landingPage;
     }
