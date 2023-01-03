@@ -44,4 +44,16 @@ extend type Query  @guard{
     landingPage(id: ID! @eq): landingPage 
     @can(ability: "view", resolved: true)
     @first
+    storeLandingsPages:[landingPage] @field(resolver: "LandingPagesQueries@storeLandingsPages") 
+}
+
+extend type Mutation  @guard{
+    createLandingPage(
+        name:String!
+        description:String
+        product_name:String!
+        domain:String!
+        product_description:String!
+        poster:Upload!
+    ):landingPage @field(resolver: "LandingMutator@newLanding") 
 }

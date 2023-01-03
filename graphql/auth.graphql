@@ -17,6 +17,9 @@ type permission {
 
 extend type Query @guard {
     users(role:Int @eq active:Int @eq): [User!] @paginate  @admin
+    storeUsers(role:Int @eq active:Int @eq): [User!] 
+    @field(resolver: "Authenticate@storeUsers")
+    @admin
     me: User @auth
     initialise:Init @field(resolver: "Authenticate@initialise")
 }
@@ -32,7 +35,7 @@ extend type Mutation @guard {
     newUser(name: String!, email: String!,password:String!): newUserResponse
         @field(resolver: "Authenticate@newAdmin")
   
-    newStaff(name: String!, email: String!, permissions: [Int!]): newUserResponse
+    newStaff(email: String!, permissions: [Int!]): newUserResponse
         @field(resolver: "Authenticate@newStaff")
         @admin
 

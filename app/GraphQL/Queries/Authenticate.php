@@ -52,14 +52,22 @@ final class Authenticate
     {
         return User::where('role', '!=', userRoles::$superAdmin)->get();
     }
+    public function storeUsers()
+    {
+        return User::where('role', '!=', userRoles::$superAdmin)->get();
+    }
     public function initialise()
     {
-        $payload = Auth::parseToken()->getPayload();
         $user=Auth::user();
-        $storeId=$payload->get('storeId');
+        $user->abilities;
+        $user->avatar;
+        $store=$user->store();
+        $store->icon;
+        if($user->isAdmin())
+        $store->users;
         return  [
-            "user"=>User::where('id',$user->id)->with(['avatar','abilities'])->first(),
-            "store"=>Store::where('id',$storeId)->with(['icon'])->first()
+            "user"=>$user,
+            "store"=>$store
         ];
 
     }

@@ -13,6 +13,7 @@ class hasPermission extends Model
         'id',
         'id_permission',
         'id_user',
+        'id_store',
 
     ];
 }

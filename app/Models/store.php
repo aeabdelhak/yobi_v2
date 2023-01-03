@@ -31,7 +31,7 @@ class store extends Model
     }
     public function users()
     {
-        return $this->hasManyThrough(User::class, storeAccess::class, 'id_store', 'id', 'id', 'id_user');
+        return $this->hasManyThrough(User::class, hasPermission::class, 'id_store', 'id', 'id', 'id_user')->distinct();
     }
     public function landings()
     {

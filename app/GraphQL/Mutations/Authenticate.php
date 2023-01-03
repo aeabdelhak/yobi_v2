@@ -7,7 +7,6 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\FilesController;
 use App\Models\hasPermission;
 use App\Models\permission;
-use App\Models\storeAccess;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 use PHPOpenSourceSaver\JWTAuth\Facades\JWTAuth as Auth;
@@ -20,7 +19,7 @@ final class Authenticate
      */
     public function __invoke($_, array $args)
     {
-        // TODO implement the resolver
+
     }
 
     public function newAdmin($rootValue, array $args)
@@ -29,13 +28,14 @@ final class Authenticate
     }
     public function newStaff($rootValue, array $args)
     {
-        return (new AuthController())->newStaff($args['email'], $args['name'], $args['permissions']);
+        return (new AuthController())->newStaff($args['email'], $args['permissions']);
     }
     public function deleteAdmin($rootValue, array $args)
     {
         $user = User::whereId($args['id'])->first();
-        hasPermission::where('id_user',$args['id'])->delete();
-        storeAccess::where('id_user',$args['id'])->delete();
+        hasPermission::where('id_user',$args['id'])->where('id_store',Auth::user()->store()->id)->delete();
+        $count=hasPermission::where('id_user',$args['id'])->count();
+        if($count==0)
         $user->role=userRoles::$user;
         if ($user->save()) {
             return true;
@@ -79,14 +79,16 @@ final class Authenticate
     public function togglePermission($rootValue, array $args)
     {
         $idPerm=permission::getId($args['code']);
+        $store=Auth::user()->store();
         if($idPerm){
-                    $hasPerm=hasPermission::where('id_user',$args['id'])->where('id_permission',$idPerm)->first();
+                    $hasPerm=hasPermission::where('id_user',$args['id'])->where('id_permission',$idPerm)->where('id_store',$store->id)->first();
                     if($hasPerm){
                         $hasPerm->delete();
                         return false;
                     }
                     $hasPrem= new hasPermission();
                     $hasPrem->id_user=$args['id'];
+                    $hasPrem->id_store=$args['id'];
                     $hasPrem->id_permission=$idPerm;
                     $hasPrem->save();
                     return true;
@@ -97,7 +99,6 @@ final class Authenticate
     }
     public function uploadAvatar($rootValue, array $args)
         {
-            
             $user = Auth::user();
             $oldAvatar = $user->id_avatar;
             $user->id_avatar = FilesController::store($args['image']);
@@ -105,7 +106,6 @@ final class Authenticate
             if ($oldAvatar) {
                 FilesController::delete($oldAvatar);
             }
-            
             return $user->avatar;
         }
 

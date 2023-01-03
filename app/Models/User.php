@@ -102,7 +102,9 @@ class User extends Authenticatable implements JWTSubject
     }
     public function abilities()
     {
-        return $this->hasManyThrough(permission::class, hasPermission::class, 'id_user', 'id', 'id', 'id_permission');
+        $payload = Auth::parseToken()->getPayload();
+        $storeId=$payload->get('storeId');
+        return $this->hasManyThrough(permission::class, hasPermission::class, 'id_user', 'id', 'id', 'id_permission')->where('id_store',$storeId);
     }
 
     public static function getAccess($id)
@@ -133,7 +135,7 @@ class User extends Authenticatable implements JWTSubject
 
     public function stores()
     {
-        return   $this->hasManyThrough(store::class,storeAccess::class, 'id_store','id','id','id_user');
+        return   $this->hasManyThrough(store::class,hasPermission::class, 'id_store','id','id','id_user');
     }
     public static function store()
     {
