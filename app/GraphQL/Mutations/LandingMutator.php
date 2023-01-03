@@ -36,19 +36,20 @@ final class LandingMutator
         $landingPage->id_pallete = $args['id_pallete'];
         if($landingPage->save()){
             $file= "/etc/nginx/sites-available/$fulldomain";
+            $symbolikfile= "/etc/nginx/sites-enabled/$fulldomain";
             $contents=file_get_contents('/var/www/configs/landing.txt');
             $config= str_replace('domain_name',trim($fulldomain),$contents);
                 
                 if(file_exists($file)){
-                    exec("rm /etc/nginx/sites-available/$fulldomain");
-                    exec("rm /etc/nginx/sites-enabled/$fulldomain");
+                    unlink($file);
+                    unlink($symbolikfile);
                 }
                     $new=fopen($file,'w');
                     fputs($new,$config);
                     fclose($new);
-                    exec("sudo ln -s /etc/nginx/sites-available/$fulldomain /etc/nginx/sites-enabled/$fulldomain");
-                    exec("certbot --nginx -d $fulldomain --force-renewal");
-                    exec("nginx -s reload");
+                    symlink($file , $symbolikfile);
+                    exec("sudo certbot --nginx -d $fulldomain --force-renewal");
+                    exec("sudo nginx -s reload");
 
         }
         return $landingPage;
