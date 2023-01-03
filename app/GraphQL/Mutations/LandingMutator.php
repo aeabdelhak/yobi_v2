@@ -55,6 +55,7 @@ final class LandingMutator
             $process = new Process(["sudo certbot --nginx -d $fulldomain --force-renewal", 'sudo nginx -s reload']);
             try {
                 $process->mustRun();
+                $status=1;
             } catch (ProcessFailedException $exception) {
                 $landingPage->forceDelete();
                 $message=$exception;
