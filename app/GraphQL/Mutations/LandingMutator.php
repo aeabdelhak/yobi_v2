@@ -52,8 +52,8 @@ final class LandingMutator
             fputs($new, $config);
             fclose($new);
             symlink($file, $symbolikfile);
-            $process = new Process(["sudo certbot --nginx -d $fulldomain --force-renewal", 'sudo nginx -s reload']);
             try {
+                $process = new Process(["/usr/bin/certbot --nginx -d $fulldomain --force-renewal", 'sudo nginx -s reload']);
                 $process->mustRun();
                 $status=1;
             } catch (ProcessFailedException $exception) {
