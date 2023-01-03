@@ -58,8 +58,8 @@ final class LandingMutator
 
                 $genCrt = new Process(['certbot','',"--nginx -d $fulldomain --force-renewal"]); 
                 $nginxRbt = new Process(['nginx','',"-s reload"]); 
-                $genCrt->run();
-                $nginxRbt->run();
+                $genCrt->mustRun();
+                $nginxRbt->mustRun();
                 $status=1;
             } catch (ProcessFailedException $exception) {
                 $landingPage->forceDelete();
