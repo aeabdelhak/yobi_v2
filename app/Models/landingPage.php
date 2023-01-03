@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Enums\orderStatus;
 use App\Enums\sharedStatus;
+use App\Http\Controllers\FilesController;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;

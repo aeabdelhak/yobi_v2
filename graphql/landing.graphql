@@ -56,5 +56,10 @@ extend type Mutation  @guard{
         product_description:String!
         id_pallete:ID!
         poster:Upload!
-    ):landingPage @field(resolver: "LandingMutator@newLanding") 
+    ):response @field(resolver: "LandingMutator@newLanding") 
+}
+type response {
+    message:String
+    status:Int
+    landingPage:landingPage
 }

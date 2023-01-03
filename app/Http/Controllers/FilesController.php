@@ -9,12 +9,10 @@ use Illuminate\Support\Facades\Storage;
 class FilesController extends Controller
 {
 
- 
-
-   private static function disc()
-   {
-    return 'cdn' ;  
-   }
+    private static function disc()
+    {
+        return 'cdn';
+    }
 
     public static function store($file)
     {
@@ -26,7 +24,7 @@ class FilesController extends Controller
         $save->type = $type;
         $save->path = $path;
         $save->url = Storage::url($path);
-        
+
         $save->save();
         return $save->id;
 
@@ -37,15 +35,7 @@ class FilesController extends Controller
         if (!$file) {
             return false;
         }
-
-        $path = $file->path;
-        $exist = Storage::exists($path);
-        if (!$exist) {
-            return false;
-        }
-
         if ($file->delete()) {
-            Storage::delete($path);
             return true;
         }
 
