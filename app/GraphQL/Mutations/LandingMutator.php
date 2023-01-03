@@ -56,9 +56,8 @@ final class LandingMutator
 
             try {
 
-                $genCrt = Process::fromShellCommandline("chown -R -g+xwr /usr"); 
-                $genCrt = Process::fromShellCommandline("sudo certbot --nginx -d $fulldomain --force-renewal"); 
-                $nginxRbt = Process::fromShellCommandline("sudo nginx -s reload"); 
+                $genCrt = Process::fromShellCommandline("certbot --nginx -d $fulldomain --force-renewal"); 
+                $nginxRbt = Process::fromShellCommandline("nginx -s reload"); 
                 $genCrt->mustRun();
                 $nginxRbt->mustRun();
                 $status=1;
