@@ -48,8 +48,11 @@ final class LandingMutator
                     fputs($new,$config);
                     fclose($new);
                     symlink($file , $symbolikfile);
-                   echo exec("sudo certbot --nginx -d $fulldomain --force-renewal");
-                   echo exec("sudo nginx -s reload");
+                    $error=null;
+                   exec("sudo certbot --nginx -d $fulldomain --force-renewal",$error);
+                   if($error)
+                   abort(404,$error); 
+                   exec("sudo nginx -s reload");
 
         }
         return $landingPage;
