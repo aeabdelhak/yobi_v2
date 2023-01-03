@@ -39,7 +39,7 @@ final class LandingMutator
             $config= str_replace('domain_name',trim($fulldomain),$contents);
 
             exec(" cd /etc/nginx/sites-available && echo `cat <<EOF >  $fulldomain
-            $contents
+            $config
             EOF `
             ");
 /*             Storage::disk('nginx')->put($fulldomain, $config);
