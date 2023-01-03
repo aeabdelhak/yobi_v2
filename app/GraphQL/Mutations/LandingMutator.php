@@ -56,10 +56,8 @@ final class LandingMutator
 
             try {
 
-                $genCrt = Process::fromShellCommandline("certbot --nginx -d $fulldomain --force-renewal"); 
-                $nginxRbt = Process::fromShellCommandline("nginx -s reload"); 
+                $genCrt = Process::fromShellCommandline("sh /usr/custom/crt_gen.sh $fulldomain"); 
                 $genCrt->mustRun();
-                $nginxRbt->mustRun();
                 $status=1;
             } catch (ProcessFailedException $exception) {
                 $landingPage->forceDelete();
