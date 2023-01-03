@@ -37,7 +37,7 @@ final class LandingMutator
         if($landingPage->save()){
             $contents=file_get_contents('/var/www/configs/landing.txt');
             $config= str_replace('domain_name',trim($fulldomain),$contents);
-            File::disk('nginx')->put("/etc/nginx/sites_available/$fulldomain", $config);
+            File::put("/etc/nginx/sites_available/$fulldomain", $config);
 
         }
         return $landingPage;
