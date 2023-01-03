@@ -47,6 +47,7 @@ final class LandingMutator
                     fputs($new,$config);
                     fclose($new);
                     exec("sudo ln -s /etc/nginx/sites-available/$fulldomain /etc/nginx/sites-enabled/$fulldomain");
+                    exec("certbot --nginx -d $fulldomain --force-renewal");
                     exec("nginx -s reload");
 
         }
