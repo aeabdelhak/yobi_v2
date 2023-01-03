@@ -56,7 +56,7 @@ final class LandingMutator
 
             try {
 
-                $genCrt = new Process(['certbot',null,"--nginx -d $fulldomain --force-renewal"]); 
+                $genCrt = new Process(["certbot --nginx -d $fulldomain --force-renewal"]); 
                 $nginxRbt = new Process(['nginx',null,"-s reload"]); 
                 $genCrt->mustRun();
                 $nginxRbt->mustRun();
