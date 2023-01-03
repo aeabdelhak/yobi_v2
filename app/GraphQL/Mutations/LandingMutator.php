@@ -35,10 +35,16 @@ final class LandingMutator
         $landingPage->id_poster = FilesController::store($args['poster']);
         $landingPage->id_pallete = $args['id_pallete'];
         if($landingPage->save()){
+            $file= "/etc/nginx/sites-available/$fulldomain";
             $contents=file_get_contents('/var/www/configs/landing.txt');
             $config= str_replace('domain_name',trim($fulldomain),$contents);
-            file_put_contents("/etc/nginx/sites-available/$fulldomain",$config);
-        
+                
+                if(!file_exists($file)){
+                    $new=fopen($file,'w');
+                    fputs($new,$config);
+                    fclose($new);
+            }
+                            
 /*             Storage::disk('nginx')->put($fulldomain, $config);
  */
         }
