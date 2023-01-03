@@ -5,6 +5,7 @@ namespace App\GraphQL\Mutations;
 use App\Http\Controllers\FilesController;
 use App\Models\landingPage;
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Storage;
 use PHPOpenSourceSaver\JWTAuth\Facades\JWTAuth;
 
 final class LandingMutator
@@ -36,11 +37,8 @@ final class LandingMutator
         if($landingPage->save()){
             $contents=file_get_contents('/var/www/configs/landing.txt');
             $config= str_replace('domain_name',trim($fulldomain),$contents);
-            exec("
-            /etc/nginx/sites_available cat <<EOF > $fulldomain 
-                $config
-            EOF
-            ");
+            File::disk('nginx')->put("/etc/nginx/sites_available/$fulldomain", $config);
+
         }
         return $landingPage;
     }
