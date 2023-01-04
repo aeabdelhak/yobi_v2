@@ -22,7 +22,6 @@ final class LandingMutator
     {
         $status=0;
         $message='';
-        $landing='';
 
         $store = JWTAuth::user()->store();
         $fulldomain = strtolower(trim($args['domain'] . '.' . $store->domain));
@@ -66,7 +65,11 @@ final class LandingMutator
             }
 
         }
-        return compact(['landingPage','status','message']);
+        return [
+            'landingPage'=>$landingPage,
+            'status'=>$status,
+            'message'=>$message,
+        ];
     }
 
 }
