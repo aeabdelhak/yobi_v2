@@ -66,7 +66,7 @@ final class LandingMutator
                 {
                     $Process = Process::fromShellCommandline("whoami");
                     $Process->mustRun();
-                    $message=$Process->getOutput();
+                    $message=shell_exec("whoami");
                     $status = 1;
                 } catch (ProcessFailedException $exception) {
                     $landingPage->forceDelete();
