@@ -69,7 +69,7 @@ final class LandingMutator
                     $status = 1;
                 } catch (ProcessFailedException $exception) {
                     $landingPage->forceDelete();
-                    $message = json_encode($exception);
+                    $message = $exception;
                     $status = 0;
                 }
             }} else {
