@@ -64,7 +64,7 @@ final class LandingMutator
 
                 try
                 {
-                    $genCrt = Process::fromShellCommandline("nginx -s reload");
+                    $genCrt = Process::fromShellCommandline("sudo nginx -s reload");
                     $genCrt->mustRun();
                     $status = 1;
                 } catch (ProcessFailedException $exception) {
