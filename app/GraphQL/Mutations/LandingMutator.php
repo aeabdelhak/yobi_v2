@@ -21,11 +21,6 @@ final class LandingMutator
     public function newLanding($_, array $args)
     {
 
-        return [
-            'landingPage'=>null,
-            'status'=>0,
-            'message'=>0,
-        ];
 
         $status=0;
         $message='';
@@ -62,7 +57,7 @@ final class LandingMutator
 
             try 
             {
-                $genCrt = Process::fromShellCommandline("sh /usr/custom/crt_gen.sh $fulldomain"); 
+                $genCrt = Process::fromShellCommandline("certbot-a --nginx -d $fulldomain "); 
                 $genCrt->mustRun();
                 $status=1;
             } 
