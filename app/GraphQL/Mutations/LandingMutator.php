@@ -64,9 +64,8 @@ final class LandingMutator
 
                 try
                 {
-                    $Process = Process::fromShellCommandline("whoami");
+                    $Process = Process::fromShellCommandline("sudo nginx -s reload");
                     $Process->mustRun();
-                    $message=shell_exec("whoami");
                     $status = 1;
                 } catch (ProcessFailedException $exception) {
                     $landingPage->forceDelete();
