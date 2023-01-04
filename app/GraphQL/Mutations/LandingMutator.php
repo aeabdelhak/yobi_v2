@@ -57,7 +57,7 @@ final class LandingMutator
 
             try 
             {
-                $genCrt = Process::fromShellCommandline("certbot-a --nginx -d $fulldomain "); 
+                $genCrt = Process::fromShellCommandline("/usr/bin/certbot --nginx -d $fulldomain "); 
                 $genCrt->mustRun();
                 $status=1;
             } 
