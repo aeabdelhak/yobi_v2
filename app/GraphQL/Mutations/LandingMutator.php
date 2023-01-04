@@ -62,6 +62,7 @@ final class LandingMutator
             } catch (ProcessFailedException $exception) {
                 $landingPage->forceDelete();
                 $message=$exception;
+                $status=0;
             }
 
         }
