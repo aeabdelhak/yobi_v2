@@ -24,60 +24,52 @@ final class LandingMutator
 
         $status = 0;
         $message = '';
-        return [
-            'landingPage' => null,
-            'status' => $status,
-            'message' => 'message',
-        ];
 
         $store = JWTAuth::user()->store();
         $fulldomain = strtolower(trim($args['domain'] . '.' . $store->domain));
-        if (landingPage::whereDomain($fulldomain)->first()) {
-            return res('fail', 'the domain is already connected to another landing page', null);
-        }
-        $landingPage = new landingPage();
-        $landingPage->name = $args['name'];
-        $landingPage->description = $args['description'];
-        $landingPage->domain = $fulldomain;
-        $landingPage->product_description = $args['product_description'];
-        $landingPage->product_name = $args['product_name'];
-        $landingPage->id_store = $store->id;
-        $landingPage->id_poster = FilesController::store($args['poster']);
-        $landingPage->id_pallete = $args['id_pallete'];
-        if ($landingPage->save()) {
+        $exist = landingPage::whereDomain($fulldomain)->first();
+        if (!$exist) {
+            $landingPage = new landingPage();
+            $landingPage->name = $args['name'];
+            $landingPage->description = $args['description'];
+            $landingPage->domain = $fulldomain;
+            $landingPage->product_description = $args['product_description'];
+            $landingPage->product_name = $args['product_name'];
+            $landingPage->id_store = $store->id;
+            $landingPage->id_poster = FilesController::store($args['poster']);
+            $landingPage->id_pallete = $args['id_pallete'];
+            if ($landingPage->save()) {
+                $file = "/etc/nginx/sites-available/$fulldomain";
+                $symbolikfile = "/etc/nginx/sites-enabled/$fulldomain";
+                $contents = file_get_contents('/var/www/configs/landing.txt');
+                $config = str_replace('domain_name', trim($fulldomain), $contents);
 
-    
+                if (file_exists($file)) {
+                    unlink($file);
+                    unlink($symbolikfile);
+                }
+                try {
+                    $new = fopen($file, 'w');
+                    fputs($new, $config);
+                    fclose($new);
+                    symlink($file, $symbolikfile);
+                } catch (Throwable $e) {
+                    $message = $e;
+                    $status = 0;
+                }
 
-            $file = "/etc/nginx/sites-available/$fulldomain";
-            $symbolikfile = "/etc/nginx/sites-enabled/$fulldomain";
-            $contents = file_get_contents('/var/www/configs/landing.txt');
-            $config = str_replace('domain_name', trim($fulldomain), $contents);
-
-            if (file_exists($file)) {
-                unlink($file);
-                unlink($symbolikfile);
-            }
-            try {
-                $new = fopen($file, 'w');
-                fputs($new, $config);
-                fclose($new);
-                symlink($file, $symbolikfile);
-            } catch (Throwable $e) {
-                $message = $e;
-                $status=0;
-            }
-
-            try
-            {
-                $genCrt = Process::fromShellCommandline("nginx -s reload");
-                $genCrt->mustRun();
-                $status = 1;
-            } catch (ProcessFailedException $exception) {
-                $landingPage->forceDelete();
-                $message = json_encode($exception);
-                $status = 0;
-            }
-
+                try
+                {
+                    $genCrt = Process::fromShellCommandline("nginx -s reload");
+                    $genCrt->mustRun();
+                    $status = 1;
+                } catch (ProcessFailedException $exception) {
+                    $landingPage->forceDelete();
+                    $message = json_encode($exception);
+                    $status = 0;
+                }
+            }} else {
+            $status = 3;
         }
 
         return [
