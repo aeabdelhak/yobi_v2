@@ -24,6 +24,7 @@ final class LandingMutator
 
         $status = 0;
         $message = '';
+        $landingPage=null;
 
         $store = JWTAuth::user()->store();
         $fulldomain = strtolower(trim($args['domain'] . '.' . $store->domain));
