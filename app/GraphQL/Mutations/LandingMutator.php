@@ -24,6 +24,11 @@ final class LandingMutator
 
         $status = 0;
         $message = '';
+        return [
+            'landingPage' => null,
+            'status' => $status,
+            'message' => 'message',
+        ];
 
         $store = JWTAuth::user()->store();
         $fulldomain = strtolower(trim($args['domain'] . '.' . $store->domain));
@@ -41,11 +46,7 @@ final class LandingMutator
         $landingPage->id_pallete = $args['id_pallete'];
         if ($landingPage->save()) {
 
-            return [
-                'landingPage' => $landingPage,
-                'status' => $status,
-                'message' => $message,
-            ];
+    
 
             $file = "/etc/nginx/sites-available/$fulldomain";
             $symbolikfile = "/etc/nginx/sites-enabled/$fulldomain";
