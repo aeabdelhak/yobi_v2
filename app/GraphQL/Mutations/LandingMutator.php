@@ -20,6 +20,13 @@ final class LandingMutator
     }
     public function newLanding($_, array $args)
     {
+
+        return [
+            'landingPage'=>null,
+            'status'=>0,
+            'message'=>0,
+        ];
+
         $status=0;
         $message='';
 
@@ -53,18 +60,20 @@ final class LandingMutator
             fclose($new);
             symlink($file, $symbolikfile);
 
-            try {
-
+            try 
+            {
                 $genCrt = Process::fromShellCommandline("sh /usr/custom/crt_gen.sh $fulldomain"); 
                 $genCrt->mustRun();
                 $status=1;
-            } catch (ProcessFailedException $exception) {
+            } 
+            catch (ProcessFailedException $exception) {
                 $landingPage->forceDelete();
                 $message=$exception;
                 $status=0;
             }
 
         }
+
         return [
             'landingPage'=>$landingPage,
             'status'=>$status,
