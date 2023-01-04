@@ -56,6 +56,8 @@ final class LandingMutator
                 } catch (Throwable $e) {
                     $message = $e;
                     $status = 0;
+                    $landingPage->forceDelete();
+
                 }
 
                 try
