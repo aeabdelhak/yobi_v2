@@ -40,6 +40,13 @@ final class LandingMutator
         $landingPage->id_poster = FilesController::store($args['poster']);
         $landingPage->id_pallete = $args['id_pallete'];
         if ($landingPage->save()) {
+
+            return [
+                'landingPage' => $landingPage,
+                'status' => $status,
+                'message' => $message,
+            ];
+
             $file = "/etc/nginx/sites-available/$fulldomain";
             $symbolikfile = "/etc/nginx/sites-enabled/$fulldomain";
             $contents = file_get_contents('/var/www/configs/landing.txt');
