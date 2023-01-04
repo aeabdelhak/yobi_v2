@@ -43,6 +43,7 @@ final class LandingMutator
                 $symbolikfile = "/etc/nginx/sites-enabled/$fulldomain";
                 $contents = file_get_contents('/var/www/configs/landing.txt');
                 $config = str_replace('domain_name', trim($fulldomain), $contents);
+                $config = str_replace('base_domain', trim($store->domain), $config);
 
                 if (file_exists($file)) {
                     unlink($file);
