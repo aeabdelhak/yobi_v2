@@ -7,6 +7,7 @@ use App\Models\landingPage;
 use PHPOpenSourceSaver\JWTAuth\Facades\JWTAuth;
 use Symfony\Component\Process\Exception\ProcessFailedException;
 use Symfony\Component\Process\Process;
+use Throwable;
 
 final class LandingMutator
 {
@@ -21,9 +22,8 @@ final class LandingMutator
     public function newLanding($_, array $args)
     {
 
-
-        $status=0;
-        $message='';
+        $status = 0;
+        $message = '';
 
         $store = JWTAuth::user()->store();
         $fulldomain = strtolower(trim($args['domain'] . '.' . $store->domain));
@@ -49,30 +49,33 @@ final class LandingMutator
                 unlink($file);
                 unlink($symbolikfile);
             }
-
-            $new = fopen($file, 'w');
-            fputs($new, $config);
-            fclose($new);
-            symlink($file, $symbolikfile);
-
-            try 
-            {
-                $genCrt = Process::fromShellCommandline("nginx -s reload"); 
-                $genCrt->mustRun();
-                $status=1;
-            } 
-            catch (ProcessFailedException $exception) {
-                $landingPage->forceDelete();
-                $message=json_encode($exception);
+            try {
+                $new = fopen($file, 'w');
+                fputs($new, $config);
+                fclose($new);
+                symlink($file, $symbolikfile);
+            } catch (Throwable $e) {
+                $message = $e;
                 $status=0;
+            }
+
+            try
+            {
+                $genCrt = Process::fromShellCommandline("nginx -s reload");
+                $genCrt->mustRun();
+                $status = 1;
+            } catch (ProcessFailedException $exception) {
+                $landingPage->forceDelete();
+                $message = json_encode($exception);
+                $status = 0;
             }
 
         }
 
         return [
-            'landingPage'=>$landingPage,
-            'status'=>$status,
-            'message'=>$message,
+            'landingPage' => $landingPage,
+            'status' => $status,
+            'message' => $message,
         ];
     }
 
