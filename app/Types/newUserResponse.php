@@ -7,6 +7,6 @@ use App\Models\User;
 class newUserResponse
 {
     public int $status;
-    public User  $user ;
+    public ?User  $user ;
 
 }

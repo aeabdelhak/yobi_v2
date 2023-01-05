@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Enums\constants;
 use App\Enums\newUserRes;
+use App\Enums\permissions;
 use App\Enums\sharedStatus;
 use App\Enums\userRoles;
 use App\Enums\userStatus;
@@ -16,16 +17,16 @@ use Illuminate\Support\Facades\Auth as theAuth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use PHPOpenSourceSaver\JWTAuth\Facades\JWTAuth as Auth;
+use Throwable;
 
 class AuthController extends Controller
 {
 
     public function register($email, $name, $password)
     {
+        $response = new \App\Types\newUserResponse();
 
         $user = User::withTrashed()->where('email', $email)->first();
-
-        $response = new \App\Types\newUserResponse();
 
         $sendMail = true;
 
@@ -67,63 +68,71 @@ class AuthController extends Controller
         return $response;
 
     }
-    public function newStaff($email, $permissions)
+    public function newStaff($idStore, $email, $permissions)
     {
-        $store = Auth::user()->store();
-        $user = User::withTrashed()->where('email', $email)->first();
-        $response = new newUserResponse();
+        DB::beginTransaction();
+        try {
+            $response = new newUserResponse();
 
-        if ($user) {
-            if ($user->role == userRoles::$superAdmin) {
-                $response->status = newUserRes::$notAllowed;
-            } 
-            else if ($user->abilities->where('id_store', $store->id)->first()) {
-                if ($user->trashed()) {
-                    $response->status = newUserRes::$restored;
-                    $user->active=userStatus::$active;
-                    $user->abilities->delete();
-                    $user->save();
-                    $user->restore();
+            $store = store::find($idStore);
+            $user = User::withTrashed()->where('email', $email)->first();
+
+            if ($user) {
+                if ($user->role == userRoles::$superAdmin) {
+                    $response->status = newUserRes::$notAllowed;
+                } else if ($user->abilities->where('id_store', $store->id)->first()) {
+                    if ($user->trashed()) {
+                        $response->status = newUserRes::$restored;
+                        $user->active = userStatus::$active;
+                        $user->abilities->delete();
+                        $user->save();
+                        $user->restore();
+                        $user->refresh();
+                        $this->addPermissions($user, $store, $permissions);
+                        $user->stores;
+                        $user->avatar;
+                        $response->user = $user;
+                    } else {
+                        $response->status = newUserRes::$exist;
+                    }
+                } else {
+                    $user->role = userRoles::$user;
                     $this->addPermissions($user, $store, $permissions);
-                    $user->stores;
+                    $user->save();
+                    $user->active = userStatus::$active;
+                    if ($user->trashed()) {
+                        $user->restore();
+                    }
+                    $user->refresh();
                     $user->avatar;
                     $response->user = $user;
+                    $response->status = newUserRes::$success;
                 }
-                else {
-                    $response->status = newUserRes::$exist;
-                }
-            }
-             else {
-                $user->role = userRoles::$user;
-                $this->addPermissions($user, $store, $permissions);
+            } else {
+                $random = str_shuffle('abcdefghjklmnopqrstuvwxyzABCDEFGHJKLMNOPQRSTUVWXYZ234567890!$%^&!$%^&');
+                $password = substr($random, 0, 10);
+                $user = new User();
+                $user->email = $email;
+                $user->password = Hash::make($password);
                 $user->save();
-                $user->active=userStatus::$active;
-                if ($user->trashed()) {
-                    $user->restore();
-                }
-                $user->refresh();
+                $user = User::withTrashed()->where('email', $email)->first();
+
+                $this->addPermissions($user, $store, $permissions);
                 $user->avatar;
+                (new SendEmailController())->welcome($email, $password);
+                DB::commit();
                 $response->user = $user;
                 $response->status = newUserRes::$success;
+
             }
-        } 
-        else {
-            $random = str_shuffle('abcdefghjklmnopqrstuvwxyzABCDEFGHJKLMNOPQRSTUVWXYZ234567890!$%^&!$%^&');
-            $password = substr($random, 0, 10);
-            $user = User::create([
-                'email' => $email,
-                'password' => Hash::make($password),
-            ]);
-            $this->addPermissions($user, $store, $permissions);
-            $user->refresh();
-            $user->avatar;
-            $response->user = $user;
-            $response->status = newUserRes::$success;
-            (new SendEmailController())->welcome($email, $password);
+
+        } catch (Throwable $r) {
+
+            DB::rollBack();
+            $response->status = newUserRes::$error;
+
         }
-
         return $response;
-
     }
 
     public function logout()
@@ -137,8 +146,10 @@ class AuthController extends Controller
 
     public function refresh()
     {
+
         $token = Auth::refresh();
         return response()->json($token)->withCookie(constants::$refreshToken, $token, null, null, null, true, true, false, 'None');
+
     }
 
     public function ungrantUsersSearch(Request $req)
@@ -159,7 +170,11 @@ class AuthController extends Controller
         $permissions = permission::whereIn('code', $permissions)->pluck('id');
 
         if ($permissions->count() != 0) {
-            $insert = [];
+            $insert []=  ['id_user' => $user->id,
+            'id_store' => $store->id,
+            'id_permission' => permissions::$access,
+            'created_at' => now(),
+            'updated_at' => now()];
             foreach ($permissions as $key => $permission) {
                 $insert[] = [
                     'id_user' => $user->id,

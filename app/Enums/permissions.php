@@ -10,4 +10,5 @@ class permissions
     public static $orders = 205;
     public static $delivery = 206;
     public static $palletes = 207;
+    public static $access = 0;
 }

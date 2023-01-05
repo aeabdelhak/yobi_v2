@@ -3,11 +3,14 @@
 namespace App\GraphQL\Queries;
 
 use App\Enums\userRoles;
+use App\Models\hasPermission;
+use App\Models\permission;
 use App\Models\store;
 use App\Models\User;
 use App\Types\authResponse;
 use GraphQL\Type\Definition\ResolveInfo;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\DB;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 use PHPOpenSourceSaver\JWTAuth\Facades\JWTAuth as Auth;
 
@@ -39,7 +42,7 @@ final class Authenticate
             $response->user = Auth::user();
 
             if ((count($stores) == 0 || count($stores) == 1) && $user->isAdmin()) {
-                Auth::factory()->setTTL(60*6);
+                Auth::factory()->setTTL(60 * 6);
                 $token = Auth::fromUser($user);
             }
         }
@@ -52,22 +55,49 @@ final class Authenticate
     {
         return User::where('role', '!=', userRoles::$superAdmin)->get();
     }
-    public function storeUsers()
+    public function storeUsers($_, $args)
     {
-        return User::where('role', '!=', userRoles::$superAdmin)->get();
+        $store = store::find($args['idStore']);
+        $store->icon;
+        $has_permisson = hasPermission::where('id_store', $store->id)->where('id_user', $args['id']);
+        return User::with(['stores', 'avatar'])->where('stores')->get();
+    }
+    public function storeUser($_, $args)
+    {
+        $user=null;
+        $abilities=null;
+
+        $store = store::find($args['idStore']);
+        if (!$store) {
+            return null;
+        }
+
+        $abilities = hasPermission::join('permissions','permissions.id','has_permissions.id_permission')->where('id_store', $args['idStore'])->where('id_user', $args['id'])->distinct()->get(DB::raw('permissions.id id , code ,description'));
+        if (count($abilities)==0) {
+            
+                return null;
+            
+        }
+        $user =User::with( 'avatar')->where('id',$args['id'])->first();
+        if(!$user){
+            return null;
+        }
+        return compact(['user','abilities']) ;
     }
     public function initialise()
     {
-        $user=Auth::user();
+        $user = Auth::user();
         $user->abilities;
         $user->avatar;
-        $store=$user->store();
+        $store = $user->store();
         $store->icon;
-        if($user->isAdmin())
-        $store->users;
-        return  [
-            "user"=>$user,
-            "store"=>$store
+        if ($user->isAdmin()) {
+            $store->users;
+        }
+
+        return [
+            "user" => $user,
+            "store" => $store,
         ];
 
     }

@@ -7,6 +7,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\FilesController;
 use App\Models\hasPermission;
 use App\Models\permission;
+use App\Models\store;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 use PHPOpenSourceSaver\JWTAuth\Facades\JWTAuth as Auth;
@@ -28,7 +29,7 @@ final class Authenticate
     }
     public function newStaff($rootValue, array $args)
     {
-        return (new AuthController())->newStaff($args['email'], $args['permissions']);
+        return (new AuthController())->newStaff($args['idStore'],$args['email'], $args['permissions']);
     }
     public function deleteAdmin($rootValue, array $args)
     {
@@ -71,6 +72,7 @@ final class Authenticate
     public function toggleStatus($rootValue, array $args)
     {
         $user = User::find($args['id']);
+        
         $user->active=$user->active==0 ?1:0;
         $user->save();
         return $user;
@@ -79,8 +81,8 @@ final class Authenticate
     public function togglePermission($rootValue, array $args)
     {
         $idPerm=permission::getId($args['code']);
-        $store=Auth::user()->store();
-        if($idPerm){
+        $store=store::find($args['idStore']);
+        if($idPerm && $store){
                     $hasPerm=hasPermission::where('id_user',$args['id'])->where('id_permission',$idPerm)->where('id_store',$store->id)->first();
                     if($hasPerm){
                         $hasPerm->delete();
@@ -88,7 +90,7 @@ final class Authenticate
                     }
                     $hasPrem= new hasPermission();
                     $hasPrem->id_user=$args['id'];
-                    $hasPrem->id_store=$args['id'];
+                    $hasPrem->id_store=$args['idStore'];
                     $hasPrem->id_permission=$idPerm;
                     $hasPrem->save();
                     return true;

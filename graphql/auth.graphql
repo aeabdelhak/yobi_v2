@@ -1,27 +1,31 @@
 type User {
     id: ID!
-    name: String!
+    name: String
     email: String!
     active: Int!
     role: Int!
     avatar: file
     abilities: [permission] @hasMany
-    stores:[store] @hasMany
+    stores: [store] @hasMany
 }
 
 type permission {
     id: ID!
-    code: String!
+    code: String
     description: String
 }
 
 extend type Query @guard {
-    users(role:Int @eq active:Int @eq): [User!] @paginate  @admin
-    storeUsers(role:Int @eq active:Int @eq): [User!] 
-    @field(resolver: "Authenticate@storeUsers")
-    @admin
+    users(role: Int @eq, active: Int @eq): [User!] @paginate @admin
+    storeUsers(idStore: ID!, role: Int @eq, active: Int @eq): [User!]
+        @field(resolver: "Authenticate@storeUsers")
+        @admin
     me: User @auth
-    initialise:Init @field(resolver: "Authenticate@initialise")
+
+    storeUser(idStore: ID!, id: ID!): storeUserReturnType
+        @field(resolver: "Authenticate@storeUser")
+
+    initialise: Init @field(resolver: "Authenticate@initialise")
 }
 
 extend type Query {
@@ -32,22 +36,24 @@ extend type Query {
 }
 
 extend type Mutation @guard {
-    newUser(name: String!, email: String!,password:String!): newUserResponse
+    newUser(name: String!, email: String!, password: String!): newUserResponse
         @field(resolver: "Authenticate@newAdmin")
-  
-    newStaff(email: String!, permissions: [Int!]): newUserResponse
-        @field(resolver: "Authenticate@newStaff")
-        @admin
 
-    deleteStaff(id: ID!): Boolean!
+    newStaff(
+        idStore: ID!
+        email: String!
+        permissions: [Int!]
+    ): newUserResponse @field(resolver: "Authenticate@newStaff") @admin
+
+    deleteStaff(idStore: ID!, id: ID!): Boolean!
         @field(resolver: "Authenticate@deleteAdmin")
         @admin
 
-    toggleUserStatus(id: ID!): User!
+    toggleUserStatus(idStore: ID!, id: ID!): User!
         @field(resolver: "Authenticate@toggleStatus")
         @admin
 
-    togglePermission(id: ID!,code:String!): Boolean!
+    togglePermission(idStore: ID!, id: ID!, code: String!): Boolean!
         @field(resolver: "Authenticate@togglePermission")
         @admin
 
@@ -62,4 +68,8 @@ extend type Mutation @guard {
 
     changeAvatar(image: Upload!): file
         @field(resolver: "Authenticate@uploadAvatar")
+}
+type storeUserReturnType {
+    user: User
+    abilities: [permission]
 }

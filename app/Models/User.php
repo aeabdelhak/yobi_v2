@@ -104,6 +104,7 @@ class User extends Authenticatable implements JWTSubject
     {
         $payload = Auth::parseToken()->getPayload();
         $storeId=$payload->get('storeId');
+        if($storeId)
         return $this->hasManyThrough(permission::class, hasPermission::class, 'id_user', 'id', 'id', 'id_permission')->where('id_store',$storeId);
     }
 

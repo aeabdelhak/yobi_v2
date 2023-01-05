@@ -39,9 +39,12 @@ extend type Query @guard {
         @field(resolver: "StoreQueries@choseStore")
 }
 extend type Mutation @guard {
-    changeStoreIcon(image: Upload!): file
+    changeStoreIcon(
+                    id:ID!
+        image: Upload!): file
         @field(resolver: "StoreMutator@changeIcon")
         updateStore( 
+                    id:ID!
                     name: String!
                     description: String
                     token: String!
@@ -52,5 +55,12 @@ extend type Mutation @guard {
                     google: String
                     ): store         
         @field(resolver: "StoreMutator@update")
+        changeDomain(idStore:ID!,domain:String!) : changeDomainResponse  
+        @field(resolver: "StoreMutator@changeDomain")
+        @admin
 
+}
+type changeDomainResponse{
+    status:Int
+    store:store
 }
