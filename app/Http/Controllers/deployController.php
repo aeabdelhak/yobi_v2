@@ -14,8 +14,13 @@ class deployController extends Controller
         $domain = $landingPage->domain . '.' . $landingPage->store->domain;
         $file = "/etc/nginx/sites-available/$domain";
         $symbolikfile = "/etc/nginx/sites-enabled/$domain";
-        unlink($file);
-        unlink($symbolikfile);
+        if (file_exists($file)) {
+            unlink($file);
+        }
+
+        if (file_exists($symbolikfile)) {
+            unlink($symbolikfile);
+        }
         $contents = file_get_contents('/var/www/configs/landing.txt');
         $config = str_replace('domain_name', trim($domain), $contents);
         $config = str_replace('base_domain', trim($storeDomain), $config);
@@ -29,8 +34,13 @@ class deployController extends Controller
         $domain = $landingPage->domain . '.' . $landingPage->store->domain;
         $file = "/etc/nginx/sites-available/$domain";
         $symbolikfile = "/etc/nginx/sites-enabled/$domain";
-        unlink($file);
-        unlink($symbolikfile);
+        if (file_exists($file)) {
+            unlink($file);
+        }
+
+        if (file_exists($symbolikfile)) {
+            unlink($symbolikfile);
+        }
     }
     public static function deployStore(store $store)
     {
@@ -38,8 +48,13 @@ class deployController extends Controller
         $file = "/etc/nginx/sites-available/$domain";
         $symbolikfile = "/etc/nginx/sites-enabled/$domain";
 
-        unlink($file);
-        unlink($symbolikfile);
+        if (file_exists($file)) {
+            unlink($file);
+        }
+
+        if (file_exists($symbolikfile)) {
+            unlink($symbolikfile);
+        }
 
         $contents = file_get_contents('/var/www/configs/store.txt');
         $config = str_replace('domain', trim($domain), $contents);
@@ -55,8 +70,13 @@ class deployController extends Controller
         $domain = $store->domain;
         $file = "/etc/nginx/sites-available/$domain";
         $symbolikfile = "/etc/nginx/sites-enabled/$domain";
-        unlink($file);
-        unlink($symbolikfile);
+        if (file_exists($file)) {
+            unlink($file);
+        }
+
+        if (file_exists($symbolikfile)) {
+            unlink($symbolikfile);
+        }
 
     }
     public static function reloadNginx()
