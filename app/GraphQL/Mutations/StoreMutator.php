@@ -43,7 +43,7 @@ final class StoreMutator
                 if (deployController::generateWildcardSSl($domain)) {
                     $landings = $store->landings;
                     deployController::undeployStore($store);
-                    foreach ($landings as $key => $$landing) {
+                    foreach ($landings as $key => $landing) {
                         deployController::undeployLanding($landing);
                     }
                     $store->domain = $domain;
