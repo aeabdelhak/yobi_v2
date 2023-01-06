@@ -38,6 +38,7 @@ type LandingPageForClient @model(class: "landingPage") {
 extend type Query {
     landingForClient(domain: String! @eq): LandingPageForClient 
     @field(resolver: "LandingPagesQueries@landingForClient") 
+    @cache(maxAge: 6000)
 
 }
 
