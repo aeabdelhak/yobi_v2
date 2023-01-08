@@ -171,7 +171,7 @@ class AuthController extends Controller
         if ($permissions->count() != 0) {
             $insert []=  ['id_user' => $user->id,
             'id_store' => $store->id,
-            'id_permission' => permissions::$access,
+            'id_permission' => 0,
             'created_at' => now(),
             'updated_at' => now()];
             foreach ($permissions as $key => $permission) {
