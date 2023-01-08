@@ -42,6 +42,7 @@ final class ColorOfferMutator
         $hasOffer->id_offer=$args['id_offer'];
         $hasOffer->save();
 
-        return hasOffer::find($hasOffer->id_offer);
+
+        return $hasOffer;
     }
 }
