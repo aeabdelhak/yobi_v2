@@ -85,8 +85,8 @@ class AuthController extends Controller
                         $response->status = newUserRes::$restored;
                         $user->active = userStatus::$active;
                         $user->abilities->delete();
+                        $user->deleted_at=null;
                         $user->save();
-                        $user->restore();
                         $user->refresh();
                         $this->addPermissions($user, $store, $permissions);
                         $user->stores;
