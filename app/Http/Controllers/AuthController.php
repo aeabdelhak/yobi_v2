@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Enums\constants;
 use App\Enums\newUserRes;
-use App\Enums\permissions;
 use App\Enums\sharedStatus;
 use App\Enums\userRoles;
 use App\Enums\userStatus;
@@ -80,13 +79,14 @@ class AuthController extends Controller
             if ($user) {
                 if ($user->role == userRoles::$superAdmin) {
                     $response->status = newUserRes::$notAllowed;
-                } else if ($user->abilities->where('id_store', $store->id)->first()) {
+                } else if 
+                ($user->abilities->where('id_store', $store->id)->first()) {
                     if ($user->trashed()) {
                         $response->status = newUserRes::$restored;
                         $user->active = userStatus::$active;
                         $user->abilities->delete();
-                        $user->save();
                         $user->restore();
+                        $user->save();
                         $user->refresh();
                         $this->addPermissions($user, $store, $permissions);
                         $user->stores;
@@ -119,12 +119,12 @@ class AuthController extends Controller
                 $this->addPermissions($user, $store, $permissions);
                 $user->avatar;
                 (new SendEmailController())->welcome($email, $password);
-                DB::commit();
+
                 $response->user = $user;
                 $response->status = newUserRes::$success;
 
             }
-
+            DB::commit();
         } catch (Throwable $r) {
 
             DB::rollBack();
@@ -169,11 +169,11 @@ class AuthController extends Controller
         $permissions = permission::whereIn('code', $permissions)->pluck('id');
 
         if ($permissions->count() != 0) {
-            $insert []=  ['id_user' => $user->id,
-            'id_store' => $store->id,
-            'id_permission' => 7,
-            'created_at' => now(),
-            'updated_at' => now()];
+            $insert[] = ['id_user' => $user->id,
+                'id_store' => $store->id,
+                'id_permission' => 7,
+                'created_at' => now(),
+                'updated_at' => now()];
             foreach ($permissions as $key => $permission) {
                 $insert[] = [
                     'id_user' => $user->id,
