@@ -44,6 +44,6 @@ final class ColorOfferMutator
         $hasOffer->refresh();
 
 
-        return hasOffer::find($hasOffer->id_offer);
+        return hasOffer::find($hasOffer->id);
     }
 }
