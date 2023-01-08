@@ -116,7 +116,6 @@ class AuthController extends Controller
                 $user->password = Hash::make($password);
                 $user->save();
                 $user = User::withTrashed()->where('email', $email)->first();
-
                 $this->addPermissions($user, $store, $permissions);
                 $user->avatar;
                 (new SendEmailController())->welcome($email, $password);
@@ -130,7 +129,7 @@ class AuthController extends Controller
 
             DB::rollBack();
             $response->status = newUserRes::$error;
-
+            throw $r;
         }
         return $response;
     }
