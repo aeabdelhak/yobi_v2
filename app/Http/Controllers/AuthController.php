@@ -85,8 +85,8 @@ class AuthController extends Controller
                         $response->status = newUserRes::$restored;
                         $user->active = userStatus::$active;
                         $user->abilities->delete();
-                        $user->deleted_at=null;
                         $user->save();
+                        $user->restore();
                         $user->refresh();
                         $this->addPermissions($user, $store, $permissions);
                         $user->stores;
@@ -98,11 +98,11 @@ class AuthController extends Controller
                 } else {
                     $user->role = userRoles::$user;
                     $this->addPermissions($user, $store, $permissions);
-                    $user->save();
                     $user->active = userStatus::$active;
                     if ($user->trashed()) {
                         $user->restore();
                     }
+                    $user->save();
                     $user->refresh();
                     $user->avatar;
                     $response->user = $user;
