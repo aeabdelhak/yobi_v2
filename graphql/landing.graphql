@@ -33,6 +33,9 @@ type LandingPageForClient @model(class: "landingPage") {
     activatedShapes: [ShapeForClient] @hasMany
     shapes: [shape] @hasMany
     offers: [offer] @hasMany
+    images: [image] @hasMany
+    results: [userResult] @hasMany
+    cards: [card] @hasMany
 }
 
 extend type Query {
