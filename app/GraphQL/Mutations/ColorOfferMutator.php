@@ -40,10 +40,8 @@ final class ColorOfferMutator
         $hasOffer->id_image=FilesController::store($args['image']);
         $hasOffer->id_color=$args['id_color'];
         $hasOffer->id_offer=$args['id_offer'];
-        $hasOffer->refresh();
-        $hasOffer->id;
-        $hasOffer->image;
-        $hasOffer->offer;
-        return $hasOffer;
+        $hasOffer->save();
+
+        return hasOffer::find($hasOffer->id_offer);
     }
 }
