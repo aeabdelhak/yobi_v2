@@ -131,7 +131,7 @@ final class LandingMutator
     {
 
         $id = $args['id'];
-        $poster = $args['poster'];
+        $poster = $args['upload'];
         $landingPage = landingPage::where('id', $id)->first();
         if ($landingPage) {
             DB::beginTransaction();
