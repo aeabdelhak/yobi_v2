@@ -25,6 +25,8 @@ class deployController extends Controller
         fputs($new, $config);
         fclose($new);
         symlink($file, $symbolikfile);
+        deployController::reloadNginx();
+
     }
     public static function undeployLanding(landingPage $landingPage)
     {
@@ -33,6 +35,7 @@ class deployController extends Controller
         $symbolikfile = "/etc/nginx/sites-enabled/$domain";
         exec("rm $file");
         exec("rm $symbolikfile");
+        deployController::reloadNginx();
 
     }
     public static function deployStore(store $store)
@@ -50,7 +53,7 @@ class deployController extends Controller
         fputs($new, $config);
         fclose($new);
         symlink($file, $symbolikfile);
-
+        deployController::reloadNginx();
     }
     public static function undeployStore(store $store)
     {
@@ -60,6 +63,7 @@ class deployController extends Controller
         $symbolikfile = "/etc/nginx/sites-enabled/$domain";
         exec("rm $file");
         exec("rm $symbolikfile");
+        deployController::reloadNginx();
 
     }
     public static function reloadNginx()
@@ -79,6 +83,7 @@ class deployController extends Controller
 
             $Process = Process::fromShellCommandline("certbot --server https://acme-v02.api.letsencrorg/directory -d *.$domain --manual --preferred-challenges http-01 certonly");
             $Process->mustRun();
+
             return true;
 
         } catch (\Throwable$th) {

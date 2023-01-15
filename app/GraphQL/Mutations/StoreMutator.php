@@ -79,6 +79,8 @@ final class StoreMutator
         $store->icon;
         $store->users;
         $store->save();
+        $store->refresh();
+        deployController::deployStore($store);
         return $store;
     }
 

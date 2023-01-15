@@ -2,8 +2,10 @@
 
 namespace App\GraphQL\Mutations;
 
+use App\Http\Controllers\deployController;
 use App\Http\Controllers\FilesController;
 use App\Models\landingPage;
+use Illuminate\Support\Facades\DB;
 use PHPOpenSourceSaver\JWTAuth\Facades\JWTAuth;
 use Symfony\Component\Process\Exception\ProcessFailedException;
 use Symfony\Component\Process\Process;
@@ -24,37 +26,25 @@ final class LandingMutator
 
         $status = 0;
         $message = '';
-        $landingPage=null;
+        $landingPage = null;
 
         $store = JWTAuth::user()->store();
-        $fulldomain = strtolower(trim($args['domain'] . '.' . $store->domain));
-        $exist = landingPage::whereDomain($fulldomain)->first();
+        $exist = landingPage::whereDomain($args['domain'])->where('id_store', $store->id)->first();
         if (!$exist) {
             $landingPage = new landingPage();
             $landingPage->name = $args['name'];
             $landingPage->description = $args['description'];
-            $landingPage->domain = $fulldomain;
+            $landingPage->domain = trim($args['domain']);
             $landingPage->product_description = $args['product_description'];
             $landingPage->product_name = $args['product_name'];
             $landingPage->id_store = $store->id;
             $landingPage->id_poster = FilesController::store($args['poster']);
             $landingPage->id_pallete = $args['id_pallete'];
             if ($landingPage->save()) {
-                $file = "/etc/nginx/sites-available/$fulldomain";
-                $symbolikfile = "/etc/nginx/sites-enabled/$fulldomain";
-                $contents = file_get_contents('/var/www/configs/landing.txt');
-                $config = str_replace('domain_name', trim($fulldomain), $contents);
-                $config = str_replace('base_domain', trim($store->domain), $config);
 
-                if (file_exists($file)) {
-                    unlink($file);
-                    unlink($symbolikfile);
-                }
                 try {
-                    $new = fopen($file, 'w');
-                    fputs($new, $config);
-                    fclose($new);
-                    symlink($file, $symbolikfile);
+                    deployController::deployLanding($landingPage);
+
                 } catch (Throwable $e) {
                     $message = $e;
                     $status = 0;
@@ -82,5 +72,80 @@ final class LandingMutator
             'message' => $message,
         ];
     }
+    public function deleteLanding($_, array $args)
+    {
+        $status = 0;
 
+        $id = $args['id'];
+        $landingPage = landingPage::where('id', $id)->first();
+        if ($landingPage) {
+            DB::beginTransaction();
+            try {
+                deployController::undeployLanding($landingPage);
+                $landingPage->delete();
+                $status = 1;
+                DB::commit();
+            } catch (\Throwable$th) {
+                DB::rollBack();
+                $status = 2;
+            }
+
+        } else {
+            $status = 0;
+        }
+        return compact('status');
+    }
+    public function changedomain($_, array $args)
+    {
+        $status = 0;
+
+        $id = $args['id'];
+        $domain = $args['domain'];
+        $landingPage = landingPage::where('id', $id)->first();
+        if ($landingPage) {
+            DB::beginTransaction();
+            try {
+                if ($domain != $landingPage->domain) {
+                    deployController::undeployLanding($landingPage);
+                }
+                $landingPage->domain = $domain;
+                $landingPage->save();
+                $landingPage->refresh();
+                if ($domain != $landingPage->domain) {
+                    deployController::deployLanding($landingPage);
+                }
+                $status = 1;
+                DB::commit();
+            } catch (\Throwable$th) {
+                DB::rollBack();
+                $status = 2;
+            }
+
+        } else {
+            $status = 0;
+        }
+        return compact('status');
+    }
+
+    public function posterChange($_, array $args)
+    {
+
+        $id = $args['id'];
+        $poster = $args['poster'];
+        $landingPage = landingPage::where('id', $id)->first();
+        if ($landingPage) {
+            DB::beginTransaction();
+            try {
+                $old = $landingPage->id_poster;
+                $landingPage->id_poster = FilesController::store($poster);
+                if ($landingPage->save()) {
+                    FilesController::delete($old);
+                }
+                return $landingPage->poster;
+            } catch (\Throwable) {
+                return null;
+            }
+        }
+        return null;
+    }
 }

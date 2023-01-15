@@ -63,9 +63,16 @@ extend type Mutation  @guard{
         id_pallete:ID!
         poster:Upload!
     ):response @field(resolver: "LandingMutator@newLanding") 
+    deleteLandingPage(id:ID!):deleteLandingPageResponse @field(resolver: "LandingMutator@deleteLanding")
+    editLandingPageDomain(id:ID!,domain:String!):deleteLandingPageResponse @field(resolver: "LandingMutator@changedomain")
+    posterChange(id:ID!,upload:Upload!):file @field(resolver: "LandingMutator@posterChange")
 }
 type response {
     message:String
     status:Int
     landingPage:landingPage
+}
+type deleteLandingPageResponse {
+    message:String
+    status:Int
 }
