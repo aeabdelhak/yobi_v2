@@ -132,7 +132,7 @@ final class LandingMutator
 
         $id = $args['id'];
         $poster = $args['upload'];
-        $landingPage = landingPage::where('id', $id)->first();
+        $landingPage = landingPage::find($id);
         if ($landingPage) {
             DB::beginTransaction();
             try {
@@ -141,8 +141,11 @@ final class LandingMutator
                 if ($landingPage->save()) {
                     FilesController::delete($old);
                 }
+                DB::commit();
                 return $landingPage->poster;
             } catch (\Throwable) {
+                DB::rollback();
+
                 return null;
             }
         }
